@@ -1,0 +1,196 @@
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 5}}
+\newcommand{\outdate}{20.11.2023}
+\newcommand{\duedate}{27.11.2023 12:00 MEZ}
+\newcommand{\video}{027}
+
+\begin{document}
+
+\input{../includes/header.tex}
+
+\question[1]{Join-Size Estimation}
+
+\begin{enumerate}
+
+  \item Estimate the size of the join $R(a,b) \Join S(b,c)$ using histograms for $R.b$ and $S.b$. Assume $V(R,b) = V(S,b) = 30$ and the histograms
+        for both attributes give the frequencies of the four most common values, as below, and further assume that every value appearing in the relation with the smaller set of values (R in this case) will also appear in the set of values of the other relation.
+
+        \begin{minipage}{.49\textwidth}
+          \begin{center}
+            \begin{tabular}{|c|r|r|r|r|r|r}
+                    & $0$   & $1$ & $2$ & $3$  & others \\\hline
+              $R.b$ & $10 $ & $8$ & $7$ & $11$ & $39$   \\
+
+            \end{tabular}
+          \end{center}
+        \end{minipage}
+        \begin{minipage}{.49\textwidth}
+          \begin{center}
+            \begin{tabular}{|c|r|r|r|r|r|r}
+                    & $0$   & $1$ & $2$  & $4$ & others \\\hline
+              $S.b$ & $12 $ & $8$ & $10$ & $8$ & $52$   \\
+
+            \end{tabular}
+          \end{center}
+        \end{minipage}
+
+        How does this estimate compare with the simpler estimate, assuming that all $30$ values are equally likely to occur, with $T(R)=75$ and $T(S)=90$?
+
+  \item Estimate the size of the natural join $R(a,b) \Join S(b,c)$ if we have the following histogram information.
+        Give a lower and upper bound for the join size and explain under which circumstances they appear.
+
+        \begin{center}
+          \begin{tabular}{c|r|r|r}
+                & $b<0$ & $b=0$ & $b>0$ \\ \hline
+            $R$ & 300   & 100   & 400   \\
+            $S$ & 300   & 200   & 600   \\
+          \end{tabular}
+        \end{center}
+
+\end{enumerate}
+
+\question[1]{Join-Ordering: Dynamic Programming}
+
+\begin{enumerate}
+  \item
+        Manually create the DP-table for the relations $A$,$B$,$C$ with cardinalities $|A|=100$, $|B|=25$, $|C|=80$ and selectivities $f_{A,C}=0.05$,
+        $f_{B,C}=0.3$ with $C_{out}$ as cost function.
+        Cross products are allowed this time.
+        Please keep the replaced entries in the table and highlight the final ones.
+
+  \item
+        Given the following DP-table with intermediate results and the query graph (with selectivities):
+
+        \begin{minipage}{0.6\textwidth}
+          \begin{tabular}{|c|c|c|c|} \hline
+            {\bf Relations}   & $T$                            & $|T|$  & $C_{out}(T)$ \\ \hline \hline
+            $\{R_1\}$         & $R_1$                          & $40$   & $0$          \\ \hline 
+            $\{R_2\}$         & $R_2$                          & $10$   & $0$          \\ \hline 
+            $\{R_3\}$         & $R_3$                          & $20$   & $0$          \\ \hline 
+            $\{R_4\}$         & $R_4$                          & $30$   & $0$          \\ \hline 
+            $\{R_1,R_2\}$     & $(R_1 \Join R_2)$              & $60$   & $60$         \\ \hline 
+            $\{R_1,R_3\}$     & $(R_1 \times R_3)$             & $800$  & $800$        \\ \hline 
+            $\{R_1,R_4\}$     & $(R_1 \times R_4)$             & $1200$ & $1200$       \\ \hline 
+            $\{R_2,R_3\}$     & $(R_2 \Join R_3)$              & $10$   & $10$         \\ \hline 
+            $\{R_2,R_4\}$     & $(R_2 \times R_4)$             & $300$  & $300$        \\ \hline 
+            $\{R_3,R_4\}$     & $(R_3 \Join R_4)$              & $36$   & $36$         \\ \hline 
+            $\{R_1,R_2,R_3\}$ & $((R_2 \Join R_3) \Join R_1)$  & $60$   & $70$         \\ \hline 
+            $\{R_1,R_2,R_4\}$ & $((R_1 \Join R_2) \times R_4)$ & $1800$ & $1860$       \\ \hline 
+            $\{R_1,R_3,R_4\}$ & $((R_3 \Join R_4) \times R_1)$ & $1440$ & $1476$       \\ \hline 
+            $\{R_2,R_3,R_4\}$ & $((R_2 \Join R_3) \Join R_4)$  & $18$   & $28$         \\ \hline 
+          \end{tabular}
+        \end{minipage}
+        \begin{minipage}{0.49\textwidth}
+          \begin{itemize}
+            \item $|R_1| = 40$
+            \item $|R_2| = 10$
+            \item $|R_3| = 20$
+            \item $|R_4| = 30$
+          \end{itemize}
+          \vspace{1em}
+          \begin{tikzpicture}[node distance=5em, auto]
+            \tikzset{
+              mynode/.style={rectangle,rounded corners,draw=white, top color=white, bottom color=white!90,very thick, inner sep=1em, minimum size=3em, text centered},
+              myarrow/.style={->, >=latex', shorten >=1pt, thick},
+              mylabel/.style={text width=7em, text centered}
+            }
+            \node (R1) {$R_1$};
+            \node[above=of R1] (R2) {$R_2$};
+            \node[right=of R2] (R3) {$R_3$};
+            \node[below=of R3] (R4) {$R_4$};
+
+            \draw[-]  (R1.north)  to node[auto, swap] {$0.15$} (R2.south);
+            \draw[-]  (R2.east)  to node[auto, swap] {$0.05$} (R3.west);
+            \draw[-]  (R3.south) to node[auto, swap] {$0.06$} (R4.north);
+
+          \end{tikzpicture}
+        \end{minipage}
+
+        Calculate the optimal bushy join tree for the relations $\{R_1, R_2, R_3, R_4\}$ with the DP-algorithm shown in the lecture.
+
+\end{enumerate}
+\newpage
+
+\question[1]{Simplifying queries}
+
+Given the following queries from the uni\_db schema from:
+
+\begin{enumerate}
+  \item \begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+SELECT DISTINCT p.name,
+ (SELECT MAX(position) FROM professors p2      |\label{line:max_prof}|
+  WHERE p2.PID=p.PID)                          |\label{line:max_prof_2}|
+FROM professors p, lectures l
+WHERE 
+ EXISTS                                        |\label{line:start_exist}|
+   (SELECT *
+    FROM
+      (SELECT                                  |\label{line:start_simplify}|
+         e.matrnr,
+         (SELECT s.name FROM students s WHERE e.matrnr=s.matrnr),
+         LID
+       FROM exam e
+       ORDER BY e.grade LIMIT 2
+       ) t,                                    |\label{line:end_simplify}|
+      lectures l2
+    WHERE t.LID = l2.LID
+      AND l2.LID = l.LID
+   )                                           |\label{line:end_exist}|
+ AND p.PID = l.heldby;                         |\label{line:outer_p_o_joinpred}| \end{lstlisting}
+
+  \item \
+        \begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny]
+SELECT
+ s2.name,
+(WITH RECURSIVE t(LID) AS (
+   SELECT exam.LID FROM students, exam
+   WHERE students.matrnr = exam.matrnr AND students.matrnr = s2.matrnr
+     AND exam.grade = (SELECT min(grade) FROM exam)
+ UNION ALL
+   SELECT prerequisites.required FROM t, prerequisites WHERE t.LID = prerequisites.lecture
+)
+SELECT count(*) FROM t) x
+FROM
+students s2;\end{lstlisting}
+\end{enumerate}
+
+Simplify (and optimize) these queries, as shown in the lecture.
+Let Postgres \verb+EXPLAIN+ the original and simplified query plans and interpret them.
+
+\newpage
+
+\question[1]{Correctness of Unnesting}
+
+Provide unnested queries for the given nested queries. Show through an example, by specifying contents of tables and corresponding results, why the type of join (e.g,. INNER, LEFT OUTER) is important when unnesting a certain query. Considering the given queries, will the change in the type of the join impact the correctness of the query?
+
+\begin{enumerate}
+  \item
+        \begin{minipage}[t]{0.5\textwidth}
+          \begin{lstlisting}[language=sql]
+SELECT DISTINCT P.playerId
+FROM Player P
+WHERE (
+    SELECT COUNT(G.id)
+    FROM Game G
+    WHERE G.playerId = P.playerId
+  ) >10
+\end{lstlisting}
+
+        \end{minipage}
+
+  \item
+
+        \begin{minipage}[t]{0.5\textwidth}
+          \begin{lstlisting}[language=sql]
+SELECT DISTINCT P.name, (SELECT COUNT(*)
+FROM Game G
+WHERE P.playerId = G.playerId)
+FROM Player P
+\end{lstlisting}
+
+        \end{minipage}
+\end{enumerate}
+
+\end{document}
