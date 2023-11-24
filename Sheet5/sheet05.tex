@@ -58,8 +58,21 @@
         Manually create the DP-table for the relations $A$,$B$,$C$ with cardinalities $|A|=100$, $|B|=25$, $|C|=80$ and selectivities $f_{A,C}=0.05$,
         $f_{B,C}=0.3$ with $C_{out}$ as cost function.
         Cross products are allowed this time.
-        Please keep the replaced entries in the table and highlight the final ones.
-
+        Please keep the replaced entries in the table and highlight the final ones.\\\\
+        {\bf Solutions:}\\\\
+        \begin{tabular}{|c|c|c|c|} \hline
+          {\bf Relations}   & $T$                     & $|T|$   & $C_{out}(T)$            \\ \hline \hline
+          $\{A\}$           & $A$                     & $100$   & $0$                     \\ \hline 
+          $\{B\}$           & $B$                     & $25$    & $0$                     \\ \hline 
+          $\{C\}$           & $C$                     & $80$    & $80$                    \\ \hline 
+          $\{A,B\}$         & $(A \times B)$          & $2500$  & $2500$                  \\ \hline 
+          $\{A,C\}$         & $(A \Join C)$           & $400$   & $400$                   \\ \hline 
+          $\{B,C\}$         & $(B \Join C)$           & $600$   & $600$                   \\ \hline 
+          $\{A,B,C\}$       & $(A \times B) \Join C$  & $3000$  & $5500$                  \\ \hline 
+          $\{A,B,C\}$       & $(A \Join C) \Join B$   & $3000$  & $\textcolor{red}{3400}$ \\ \hline 
+          $\{A,B,C\}$       & $(B \Join C) \Join A$   & $3000$   & $3600$                 \\ \hline 
+        \end{tabular}
+        \newpage
   \item
         Given the following DP-table with intermediate results and the query graph (with selectivities):
 
@@ -108,7 +121,25 @@
           \end{tikzpicture}
         \end{minipage}
 
-        Calculate the optimal bushy join tree for the relations $\{R_1, R_2, R_3, R_4\}$ with the DP-algorithm shown in the lecture.
+        Calculate the optimal bushy join tree for the relations $\{R_1, R_2, R_3, R_4\}$ with the DP-algorithm shown in the lecture.\\\\
+        {\bf Solutions:}\\\\
+        If all relations are joined, the $|T|$ will be equal for all possible join trees. Because the result will always be the same, only the way of computation changes when using a different join tree. That means, for all four relations, $|T|$ only needs to be calculated once.\\\\
+        Calculating $|T|$ with the relation $\{R_1,R_2,R_3\} \Join \{R_4\}$:\\
+        $|T| = 60 \cdot 30 \cdot 0.06$\\
+        $|T| = 108$\\\\
+        Cost calculations for all posible join trees:\\\\
+        $C_{out} (\{R_1,R_2,R_3\} \Join \{R_4\}) = 70 + 0 + 108 = 178$\\
+        $C_{out} (\{R_1,R_2,R_4\} \Join \{R_3\}) = 1860 + 0 + 108 = 1968$\\
+        $C_{out} (\{R_1,R_3,R_4\} \Join \{R_2\}) = 1476 + 0 + 108 = 1584$\\
+        $C_{out} (\{R_2,R_3,R_4\} \Join \{R_1\}) = 28 + 0 + 108 = 136$\\
+        $C_{out} (\{R_1,R_2\} \Join \{R_3,R_4\}) = 60 + 36 + 108 = 204$\\
+        $C_{out} (\{R_1,R_3\} \Join \{R_2,R_4\}) = 800 + 300 + 108 = 1208$\\
+        $C_{out} (\{R_1,R_4\} \Join \{R_2,R_3\}) = 1200 + 10 + 108 = 1318$\\\\
+        There are double the amount of possible join trees available, but because a join is commutative, they would result in the same cost. As visible from the calculations, the best solution for ${R_2, R_3, R_4}$ joined with the best solution of ${R_1}$ results in the join tree with the lowest cost. That can be written as:\\
+        \[ (((R_2 \Join R_3) \Join R_4) \Join R_1)\] 
+        \[C_{out} (((R_2 \Join R_3) \Join R_4) \Join R_1) = 136\]
+        
+
 
 \end{enumerate}
 \newpage
