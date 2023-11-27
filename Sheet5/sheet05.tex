@@ -36,8 +36,21 @@
           \end{center}
         \end{minipage}
 
-        How does this estimate compare with the simpler estimate, assuming that all $30$ values are equally likely to occur, with $T(R)=75$ and $T(S)=90$?
-
+        How does this estimate compare with the simpler estimate, assuming that all $30$ values are equally likely to occur, with $T(R)=75$ and $T(S)=90$?\\\\
+  {\bf Solution:}
+  0,1,2 appear in both the histograms.
+  For b=0 
+    10 tuples of R with b=0 join with 12 tuples of S having the same b-value leading to 120 tuples in the result
+  For b=1
+    8 tuples of R with b=1 join with 8 tuples of S having the same b-value leading to 64 tuples in the result
+  For b=2
+    7 tuples of R with b=2 join with 10 tuples of S having the same b-value leading to 70 tuples in the result
+  
+  {\bf Was not able to solve the below two parts of 1a, on how to estimate values to calculate.}
+  The value of b=3 of R is not present in S and the value of b=4 of S is not present in R. Hence we have to estimate - Need explanation from this part onwards until the end of 1a.
+  
+  How does this estimate compare with the simpler estimate, assuming that all 30 values are equally likely to occur, with $T(R)=75$ and $T(S)=90$?
+  
   \item Estimate the size of the natural join $R(a,b) \Join S(b,c)$ if we have the following histogram information.
         Give a lower and upper bound for the join size and explain under which circumstances they appear.
 
@@ -48,6 +61,15 @@
             $S$ & 300   & 200   & 600   \\
           \end{tabular}
         \end{center}
+{\bf Solution:}
+The 100 tuples of R with $b = 0$ join with the 200 tuples of S with same b-value as b=0 is appearing in both the histogram, leading to the result of 20000 tuples
+For the values b<0 and b>0, we don’t know how many times b would appear in both the histograms.
+For b<0 and b>0, we might have distinct values.If both have distinct values, then we consider as 0 for both relations for the lower bound.
+Lower bound is: $20000 + 0 + 0 = 20000$\\
+If b has same values in both R and S, we consider joining them with the respective values of R and S with $b<0$ and $b>0$
+$b<0$ : 300 tuples of R with $b<0$ join with 300 tuples of S with same b-value leading to 90000 tuples
+$b>0$: 400 tuples of R with $b>0$ join with 600 tuples of S with same b-value leading to 240000 tuples\\
+Upper bound is : $20000+90000+240000 = 350000$
 
 \end{enumerate}
 
@@ -171,8 +193,96 @@ WHERE
    )                                           |\label{line:end_exist}|
  AND p.PID = l.heldby;                         |\label{line:outer_p_o_joinpred}| \end{lstlisting}
 
-  \item \
-        \begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny]
+{\bf Solutions:}\\\\
+From line 2 to 3 the nested query is not needed. It looks for the maximum position for only one position value for each professors. 
+Just adding the position value to the SELECT statement will result in the same query.\\
+
+Before:
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+  SELECT DISTINCT p.name,
+   (SELECT MAX(position) FROM professors p2      |\label{line:max_prof}|
+    WHERE p2.PID=p.PID)                          |\label{line:max_prof_2}|
+  FROM professors p, lectures l
+\end{lstlisting}
+
+Optimised:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+  SELECT DISTINCT p.name, p.position
+  FROM professors p, lectures l
+\end{lstlisting}
+\newpage
+The following WHERE statement checks two conditions. If the professors holdes the lecture and there is a nested EXISTS check. Because EXISTS only checks if there is at least one
+element in the table it is not important what the elements of the table contain. Therefor the most inner The most inner sub query is not nesasary and also not the
+matrnr. Only LID is needed for the following WHERE check.\\
+Before:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+      (SELECT                                  |\label{line:start_simplify}|
+         e.matrnr,
+         (SELECT s.name FROM students s WHERE e.matrnr=s.matrnr),
+         LID
+       FROM exam e
+       ORDER BY e.grade LIMIT 2
+       )
+\end{lstlisting}
+
+Optimised:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+      (SELECT e.LID                                  |\label{line:start_simplify}|
+       FROM exam e
+       ORDER BY e.grade LIMIT 2)
+\end{lstlisting}
+
+Also the check of the following WHERE clause can be simplified as the following.\\
+Before:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+  WHERE t.LID = l2.LID
+      AND l2.LID = l.LID
+\end{lstlisting}
+
+Optimised:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+  WHERE t.LID = l.LID
+\end{lstlisting}
+
+Also, the nested SELECT * query is completely unnecessary because it just takes the exact value of the inner nested query.\\
+Taking all these factors into account, our query looks like the following:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+  SELECT DISTINCT p.name, p.position
+  FROM professors p, lectures l
+  WHERE 
+   EXISTS                                        |\label{line:start_exist}|
+      (SELECT e.LID                                  |\label{line:start_simplify}|
+      FROM exam e
+      WHERE e.LID = l.LID
+      ORDER BY e.grade LIMIT 2)                                          
+   AND p.PID = l.heldby;                         |\label{line:outer_p_o_joinpred}| 
+\end{lstlisting}
+
+\newpage
+The only nested query that still remains is only dependent on the lecture relation and not on the professors relation. Instead of EXISTS, IN can be used in this case.\\
+The final result looks like the following:
+
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny,escapechar=|]
+  SELECT DISTINCT p.name, p.position
+  FROM professors p, lectures l
+  WHERE 
+    l.LID IN                                   |\label{line:start_exist}|
+      (SELECT LID                                  |\label{line:start_simplify}|
+      FROM exam
+      ORDER BY grade LIMIT 2)                                          
+   AND p.PID = l.heldby;                         |\label{line:outer_p_o_joinpred}| 
+\end{lstlisting}
+
+        
+When looking at the query plans, the cost is noticeably lower than the cost of the original query. The main reason for this is that the optimized query has to execute one join less than the original query.
+\item \
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny]
 SELECT
  s2.name,
 (WITH RECURSIVE t(LID) AS (
@@ -185,10 +295,34 @@ SELECT
 SELECT count(*) FROM t) x
 FROM
 students s2;\end{lstlisting}
-\end{enumerate}
 
-Simplify (and optimize) these queries, as shown in the lecture.
-Let Postgres \verb+EXPLAIN+ the original and simplified query plans and interpret them.
+\newpage
+{\bf Solution:}
+In order to optimize the query, we have to make the inner WITH RECURSIVE query independent from the outer query. So, we only have to execute this inner query once. 
+So far, it is dependent on the outer table s2. It is only comparing the matrnr of the table s2 with the exam matrnr. If the WITH RECURSIVE table t also has the matrnr as a
+parameter, we can perform a join later to avoid a nested query.\\ 
+The optimized query looks like the following:
+\begin{lstlisting}[language=sql,numbers=left, stepnumber=1, numberstyle = \tiny]
+  WITH RECURSIVE t(matrnr, LID) AS 
+  (
+      SELECT exam.matrnr, exam.LID FROM exam
+      WHERE exam.grade = (SELECT min(grade) FROM exam)
+    UNION ALL
+      SELECT prerequisites.required FROM t, prerequisites 
+      WHERE t.LID = prerequisites.lecture
+  )
+
+  SELECT
+   s2.name,
+   x.amount 
+  FROM
+  students s2 LEFT JOIN (SELECT count(*) amount, matrnr FROM t) x ON (s.matrnr = x.matrnr);
+\end{lstlisting}
+
+It is important to mention that the optimized query is returning null instead of 0 for the count column. When analyzing the query plan, the calculated cost for the optimized plan
+is lower than the cost for the original plan because the table t is not executed for each element of students but only once.
+
+\end{enumerate}
 
 \newpage
 
@@ -198,7 +332,6 @@ Provide unnested queries for the given nested queries. Show through an example, 
 
 \begin{enumerate}
   \item
-        \begin{minipage}[t]{0.5\textwidth}
           \begin{lstlisting}[language=sql]
 SELECT DISTINCT P.playerId
 FROM Player P
@@ -208,20 +341,49 @@ WHERE (
     WHERE G.playerId = P.playerId
   ) >10
 \end{lstlisting}
+{\bf Solution:}\\
+The query defines us to return the players  ids of the players who play more than 10 games.
+Hence we use a regular join to un-nest the query. If we consider the inner query, it would return the count of all the game ids played by all players, when it has to compare, it has to go through every record of the inner query output to search for the values greater than 10 which is costly.
 
-        \end{minipage}
+It is a dependent join as the inner query depends on the outer query. 
+
+Hence we create a regular join, which counts the game ids from the game table, the output of the common key (playerID) between the players and game table would be the number of games played by a particular player.
+
+If we group them with the player id, we get the games played by each player and then we filter the output of the group by column using aggregate condition of count > 10.
+
+Group by P.playerID returns the unique player id details, hence we do not need DISTINCT in the select query.
+
+\begin{lstlisting}[language=sql]
+SELECT P.playerId
+FROM Player P, Game G,
+WHERE P.playerID = G.playerId
+GROUP by P.playerId
+HAVING count(G.ID)>10
+\end{lstlisting}
 
   \item
 
-        \begin{minipage}[t]{0.5\textwidth}
           \begin{lstlisting}[language=sql]
 SELECT DISTINCT P.name, (SELECT COUNT(*)
 FROM Game G
 WHERE P.playerId = G.playerId)
 FROM Player P
 \end{lstlisting}
+\newpage
+{\bf Solution:}\\
+This query defines us to return all the players who play games. It is also a dependent join as the inner query is dependent on the outer query.
 
-        \end{minipage}
+If we just join the column with the regular join, it might miss out on the count of the players who did not play any game as it would not find any match in the where condition.
+ Hence we use LEFT OUTER JOIN here to join both tables here.
+
+Group by P.name returns the unique player id details, hence we do not need DISTINCT in the select query.
+
+\begin{lstlisting}[language=sql]
+SELECT P.name, Count(G.Id)
+FROM Player P LEFT OUTER JOIN Game G,
+WHERE P.playerID = G.playerId
+GROUP by P.name
+\end{lstlisting}
 \end{enumerate}
 
 \end{document}
