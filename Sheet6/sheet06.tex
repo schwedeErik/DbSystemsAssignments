@@ -1,0 +1,165 @@
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 6}}
+\newcommand{\outdate}{27.11.2023}
+\newcommand{\duedate}{04.12.2023 12:00 MEZ}
+\newcommand{\video}{033}
+
+\begin{document}
+
+\input{../includes/header.tex}
+
+\question[1]{Denormalization and rewriting}
+  For this question, we will take another look at the uni\_db schema from sheet 2:
+
+\begin{enumerate}
+\item
+
+  How can you modify/denormalize this schema, to answer the following query efficiently?
+  Which downsides will this have?\\
+  Describe the normal forms of the original and changed schema in your answer. 
+  Also note which additional steps have to be taken to keep the data consistent.
+
+  \textbf{Required submission:} Denormalized table schema; Explanation and downsides of denormalization; Query after denormalization; Explanation on how to keep data consistent; Normal form of original table schema; Normal form of new table schema.
+
+  \begin{itemize}
+    \item Q1: A list of all student names and the lecture title and SWS points of all the lectures they attend.
+  \end{itemize}
+
+\item
+  Rewrite the following queries to more efficient queries, returning the same result set.
+  Consider the conditions noted for each of the queries.
+
+  \begin{enumerate}
+  \item
+
+    \begin{lstlisting}[language=sql]
+    SELECT DISTINCT *
+    FROM Professors
+    \end{lstlisting}
+
+  \item
+    \begin{lstlisting}[language=sql]
+    SELECT COUNT(DISTINCT l.LID)
+    FROM Prerequisites p, Lectures l
+    WHERE p.Required = l.LID
+    \end{lstlisting}
+
+  \item
+    \begin{lstlisting}[language=sql]
+    SELECT COUNT(HeldBy)
+    FROM Lectures
+    GROUP BY LID
+    HAVING LID = 5001
+    \end{lstlisting}
+
+  \end{enumerate}
+
+\item 
+ Can the view be used to execute the query? Explain in detail why the view can be used or why it cannot be used.
+
+\begin{minipage}{0.4\columnwidth}
+\hspace{1.4cm}{\bf {Query}}
+\end{minipage}
+\begin{minipage}{0.4\columnwidth}
+\hspace{1.4cm}{\bf {View}}
+\end{minipage}
+
+\begin{minipage}{0.4\columnwidth}
+\begin{verbatim}
+SELECT MatrNr
+FROM Exam
+WHERE Grade < 3
+
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.4\columnwidth}
+\begin{verbatim}
+SELECT MatrNr, PID
+FROM Exam
+WHERE Grade = 1
+\end{verbatim}
+\end{minipage}
+
+\end{enumerate}
+
+\newpage
+
+\question[1]{Min-Hashing}
+Implement Min-Hashing in a language of your choice.
+Your program has to take two text files as input and parse them into sets of words.
+The program has to calculate and display:
+\begin{itemize}
+\item Jaccard coefficient between the two texts.
+\item The similarity estimated by Min-Hashing with k different hash functions (for each $k \in [1,6]$)
+\item The similarity estimated by Min-Hashing with k different min values of one hash function (for each $k \in [1,6]$)
+\end{itemize}
+
+You can use the template in OLAT, which already parses the files and provides 6 hash functions.
+Submit the code and the output of your program when executed with the two data files provided in OLAT.
+If you do not use the template, also submit instructions on how to compile and execute your program.
+Do not submit the data files.
+
+\question[1]{Quadtrees}
+
+\begin{enumerate}
+\item Give 8 points, with coordinates where each dimension has values in the range $[0,100]$, and sort them into two insertion orders.
+The first should have less empty leaf nodes if inserted into a quadtree than if they were inserted into a PR quadtree.
+The second one the other way around.
+
+Submit the points, the two insertion orders and draw the (PR) quadtrees. You can either draw them as tree or as the grid visualization.
+
+\item
+Assuming we have the whole dataset present upon insertion, describe one possible way that optimizes the creation of the quadtree, such that the height of the resulting quadtree is minimized.
+Note that before the bulk-loading, preprocessing of the data is allowed.
+
+\item
+  Assuming we are given uniformly distributed point data, what is the probability that a node at depth $k$ contains a particular point in a PR Quad tree? 
+  Additionally, for a collection of $v$ points, calculate the probability that none of the points lies in a given cell at depth $k$? 
+
+\end{enumerate}
+
+\newpage
+\question[1]{kd tree}
+
+\begin{enumerate}
+\item
+  Insert the following values, in provided order, into an empty $k$d tree, with $k=3$:
+
+  \begin{minipage}{0.48\textwidth}
+    \begin{enumerate}[label={\color{gray}\arabic*.}]
+      \item (19, 31, 83)
+      \item (64, 27, 97)
+      \item (66, 8, 101)
+      \item (99, 86, 34)
+      \item (12, 92, 55)
+      \item (76, 39, 85)
+    \end{enumerate}
+  \end{minipage}
+  \begin{minipage}{0.48\textwidth}
+    \begin{enumerate}[label={\color{gray}\arabic*.}]
+      \setcounter{enumii}{6}
+      \item (85, 68, 4)
+      \item (98, 60, 59)
+      \item (13, 52, 9)
+      \item (44, 39, 91)
+      \item (29, 35, 57)
+      \item (43, 15, 98)
+    \end{enumerate}
+  \end{minipage}
+
+  Draw the result as a tree, like shown in the lecture.
+  Note which values you used for the split.
+
+\item
+Adaptive kd tree
+
+Provide \textbf{in detail} an algorithm, in pseudo code, that takes a list of coordinates in $k$ dimensions and builds a $k$d tree.
+This tree may have a maximum of ten data points in its leaves.
+The dimension used for the split should be the one with the largest variance.
+The value used for the split, should be the average of the split dimension of all relevant coordinates.
+
+\end{enumerate}
+
+\end{document}
