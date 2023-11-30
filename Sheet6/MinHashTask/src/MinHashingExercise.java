@@ -1,8 +1,10 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  *
@@ -50,12 +52,49 @@ public class MinHashingExercise {
      * @param rhs The second list of strings.
      * @return The Jaccard similarity of the two lists in range [0,1].
      */
+
     private static double jaccard(List<String> lhs, List<String> rhs) {
-        /////////////////////////////////////////
-        // TODO Your Code Here 
-        /////////////////////////////////////////
-        System.out.println("Jaccard function not implemented!");
-        return -1;
+
+        var distinctWords = new ArrayList<String>();
+        var allWords = Stream.concat(lhs.stream(), rhs.stream()).toList();
+        for (var word:
+                allWords) {
+            boolean duplicat = false;
+            for (var distinctWord:
+                 distinctWords) {
+
+
+                if(word.equals(distinctWord))
+                {
+                   duplicat = true;
+                   break;
+                }
+            }
+
+            if(duplicat)
+                continue;
+
+            distinctWords.add(word);
+        }
+        var duplicatedWords = new ArrayList<String>();
+
+        for (var leftWord:
+             lhs) {
+            boolean notDuplicated = true;
+            for(var rightWord:
+                rhs)
+            {
+                if(leftWord.equals(rightWord))
+                {
+                    if(duplicatedWords.stream().anyMatch( dw -> dw.equals(rightWord)))
+                        continue;
+
+                    duplicatedWords.add(rightWord);
+                }
+            }
+        }
+
+        return ((double)(duplicatedWords.size()))/((double)(distinctWords.size()));
     }
 
     /**
