@@ -50,7 +50,6 @@ public class MinHashingExercise {
      * @param rhs The second list of strings.
      * @return The Jaccard similarity of the two lists in range [0,1].
      */
-
     private static double jaccard(List<String> lhs, List<String> rhs) {
 
         var distinctWords = new ArrayList<String>();
@@ -90,11 +89,6 @@ public class MinHashingExercise {
         }
 
         return duplicatedWords.size()/(double)distinctWords.size();
-    }
-
-    private static int customHashFunction(String word, int seed) {
-        //return word.hashCode()%((seed+1)*2);
-        return hash(seed,word);
     }
 
     /**
