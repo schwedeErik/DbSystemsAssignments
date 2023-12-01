@@ -1,9 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -84,17 +82,19 @@ public class MinHashingExercise {
             for(var rightWord:
                 rhs)
             {
-                if(leftWord.equals(rightWord))
+                if(leftWord.equals(rightWord) && duplicatedWords.stream().noneMatch( dw -> dw.equals(rightWord)))
                 {
-                    if(duplicatedWords.stream().anyMatch( dw -> dw.equals(rightWord)))
-                        continue;
-
                     duplicatedWords.add(rightWord);
                 }
             }
         }
 
         return ((double)(duplicatedWords.size()))/((double)(distinctWords.size()));
+    }
+
+    private static int customHashFunction(String word, int seed) {
+        int hash = word.hashCode()%((seed+1)*2);
+        return hash;
     }
 
     /**
@@ -105,11 +105,35 @@ public class MinHashingExercise {
      * @return The Min-Hashing similarity of the two lists in range [0,1].
      */
     private static double similaritykHash(int k, List<String> lhs, List<String> rhs) {
-        /////////////////////////////////////////
-        // TODO Your Code Here 
-        /////////////////////////////////////////
-        System.out.println("similaritykHash function not implemented!");
-        return -1;
+
+        // List of hash values of the elements in lhs for each hash function
+        var lhsHashValues = new ArrayList<ArrayList<Integer>>();
+
+
+        // List of hash values for rhs for each hash function
+        var rhsHashValues = new ArrayList<ArrayList<Integer>>();
+
+        double hits = 0;
+        for(int i = 0; i<k; i++)
+        {
+            lhsHashValues.add(new ArrayList<Integer>());
+            rhsHashValues.add(new ArrayList<Integer>());
+            for (var word:
+                 lhs) {
+                lhsHashValues.get(i).add(customHashFunction(word, i));
+            }
+            for (var word:
+                 rhs) {
+                rhsHashValues.get(i).add(customHashFunction(word, i));
+            }
+
+            var minLhsHashValue = lhsHashValues.get(i).stream().min(Comparator.comparing(Integer::intValue)).get();
+            var minRhsHashValue = rhsHashValues.get(i).stream().min(Comparator.comparing(Integer::intValue)).get();
+
+            if(minRhsHashValue == minLhsHashValue)
+                hits++;
+        }
+        return hits/((double)(k));
     }
 
     /**
@@ -120,11 +144,36 @@ public class MinHashingExercise {
      * @return The Min-Hashing similarity of the two lists in range [0,1].
      */
     private static double similaritykValues(int k, List<String> lhs, List<String> rhs) {
-        /////////////////////////////////////////
-        // TODO Your Code Here 
-        /////////////////////////////////////////
-        System.out.println("similaritykValues function not implemented!");
-        return -1;
+        var lhsHashValues = new ArrayList<Integer>();
+        var rhsHashValues = new ArrayList<Integer>();
+        for (var word:
+             lhs) {
+            if(!lhsHashValues.contains(word.hashCode()))
+                lhsHashValues.add(word.hashCode());
+        }
+
+        for (var word:
+             rhs) {
+            if(!rhsHashValues.contains(word.hashCode()))
+                rhsHashValues.add(word.hashCode());
+        }
+
+        List<Integer> kSmallestLhsValues = lhsHashValues.stream().sorted().toList().subList(0,k);
+        List<Integer> kSmallestRhsValues = rhsHashValues.stream().sorted().toList().subList(0,k);
+
+        var hitList = new ArrayList<Integer>();
+        for(var lhsHashValue:
+            kSmallestLhsValues)
+        {
+            for(var rhsHashValue:
+            kSmallestRhsValues)
+            {
+            if(rhsHashValue.intValue() == lhsHashValue.intValue())
+                hitList.add(rhsHashValue);
+            }
+        }
+
+        return ((double)(hitList.stream().distinct().toList().size()))/((double)(k));
     }
 
     /**
