@@ -89,12 +89,12 @@ public class MinHashingExercise {
             }
         }
 
-        return ((double)(duplicatedWords.size()))/((double)(distinctWords.size()));
+        return duplicatedWords.size()/(double)distinctWords.size();
     }
 
     private static int customHashFunction(String word, int seed) {
-        int hash = word.hashCode()%((seed+1)*2);
-        return hash;
+        //return word.hashCode()%((seed+1)*2);
+        return hash(seed,word);
     }
 
     /**
@@ -109,31 +109,22 @@ public class MinHashingExercise {
         // List of hash values of the elements in lhs for each hash function
         var lhsHashValues = new ArrayList<ArrayList<Integer>>();
 
-
         // List of hash values for rhs for each hash function
         var rhsHashValues = new ArrayList<ArrayList<Integer>>();
 
-        double hits = 0;
+        var hits = 0;
         for(int i = 0; i<k; i++)
         {
-            lhsHashValues.add(new ArrayList<Integer>());
-            rhsHashValues.add(new ArrayList<Integer>());
-            for (var word:
-                 lhs) {
-                lhsHashValues.get(i).add(customHashFunction(word, i));
-            }
-            for (var word:
-                 rhs) {
-                rhsHashValues.get(i).add(customHashFunction(word, i));
-            }
+            lhsHashValues.add(retrieveDistinctHashValues(lhs, i));
+            rhsHashValues.add(retrieveDistinctHashValues(rhs, i));
 
             var minLhsHashValue = lhsHashValues.get(i).stream().min(Comparator.comparing(Integer::intValue)).get();
             var minRhsHashValue = rhsHashValues.get(i).stream().min(Comparator.comparing(Integer::intValue)).get();
 
-            if(minRhsHashValue == minLhsHashValue)
+            if(minRhsHashValue.intValue() == minLhsHashValue.intValue())
                 hits++;
         }
-        return hits/((double)(k));
+        return hits/(double)(k);
     }
 
     /**
@@ -143,20 +134,26 @@ public class MinHashingExercise {
      * @param rhs The second list of strings.
      * @return The Min-Hashing similarity of the two lists in range [0,1].
      */
-    private static double similaritykValues(int k, List<String> lhs, List<String> rhs) {
-        var lhsHashValues = new ArrayList<Integer>();
-        var rhsHashValues = new ArrayList<Integer>();
-        for (var word:
-             lhs) {
-            if(!lhsHashValues.contains(word.hashCode()))
-                lhsHashValues.add(word.hashCode());
-        }
 
+    private  static ArrayList<Integer> retrieveDistinctHashValues(List<String> words, int hashSeed)
+    {
+        var wordHashValues = new ArrayList<Integer>();
         for (var word:
-             rhs) {
-            if(!rhsHashValues.contains(word.hashCode()))
-                rhsHashValues.add(word.hashCode());
+                words) {
+            var hashValue = hash(hashSeed, word);
+            if(!wordHashValues.contains(hashValue))
+                wordHashValues.add(hashValue);
         }
+        return  wordHashValues;
+    }
+    private static double similaritykValues(int k, List<String> lhs, List<String> rhs) {
+
+        var hashSeed = 0;
+        //distinct hash values for the lhs
+        var lhsHashValues = retrieveDistinctHashValues(lhs,hashSeed);
+
+        //distinct hash values for the rhs
+        var rhsHashValues = retrieveDistinctHashValues(rhs,hashSeed);
 
         List<Integer> kSmallestLhsValues = lhsHashValues.stream().sorted().toList().subList(0,k);
         List<Integer> kSmallestRhsValues = rhsHashValues.stream().sorted().toList().subList(0,k);
@@ -173,7 +170,7 @@ public class MinHashingExercise {
             }
         }
 
-        return ((double)(hitList.stream().distinct().toList().size()))/((double)(k));
+        return hitList.stream().distinct().toList().size()/(double)(k);
     }
 
     /**
