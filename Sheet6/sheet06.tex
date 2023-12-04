@@ -27,6 +27,30 @@
     \item Q1: A list of all student names and the lecture title and SWS points of all the lectures they attend.
   \end{itemize}
 
+  {\bf Solution:}\\
+  Denormalized table schema: The query for the given question is as follows:
+  \begin{lstlisting}[language=sql]
+  SELECT S.NAME, A.LID, L.SWS 
+  FROM STUDENTS S, ATTENDS A, LECTURES L
+  WHERE S.Matrnr = A.Matrnr AND A.LID = L.LID
+  \end{lstlisting}
+  Explanation and downsides of denormalization:\\
+	We can store all the queries in one table to avoid multiple table accesses by which we 	can avoid joins. The data after being stored is a single table would be redundant.
+	Query after denormalization; 
+	The attends table can be used to store the additional column as it is acting as a foreign key to both students and lectures tables. Hence, we add the columns of 
+  student name and sws to the attends table.
+    
+  \begin{lstlisting}[language=sql]
+  SELECT A.NAME, A.LID, A.SWS
+  FROM ATTENDS A
+  \end{lstlisting}
+
+Explanation on how to keep data consistent:\\
+As we are combining additional columns, we need more storage to store the data and 	keep it consistent. If the original table has any changes to data, the changes have to 		be made to this attends table columns that have been added(name and sis columns), 		so the data would be up-to date in both the original table as well as this attends 		table.
+Normal form of original table schema; Normal form of new table schema
+The normal form of the original table schema would be 3NF as it does not have transitive partial dependencies and reduces the data duplication. Adding the columns to the attends table, would repeats data making it in 1NF.
+
+\newpage
 \item
   Rewrite the following queries to more efficient queries, returning the same result set.
   Consider the conditions noted for each of the queries.
@@ -39,12 +63,29 @@
     FROM Professors
     \end{lstlisting}
 
+    Output: 
+    \begin{lstlisting}[language=sql]
+    SELECT * FROM PROFESSORS
+    \end{lstlisting}
+    Usage of distinct can be avoided here as each professor has unique ids given and the tuples with the primary key in the table would be returned.\\ 
+    Result: 7 records
+
   \item
     \begin{lstlisting}[language=sql]
     SELECT COUNT(DISTINCT l.LID)
     FROM Prerequisites p, Lectures l
     WHERE p.Required = l.LID
     \end{lstlisting}
+
+    Output:
+    \begin{lstlisting}[language=sql] 
+    SELECT COUNT(DISTINCT p.REQUIRED)
+    FROM Prerequisites p
+    \end{lstlisting}
+    Usage of join is not required here as we can also fetch the count of required column using the prerequisites table.\\
+
+    Result: 4 records
+
 
   \item
     \begin{lstlisting}[language=sql]
@@ -54,8 +95,19 @@
     HAVING LID = 5001
     \end{lstlisting}
 
-  \end{enumerate}
+    Output:
+    \begin{lstlisting}[language=sql]
+		SELECT COUNT(HeldBy)
+		FROM Lectures
+		WHERE LID = 5001
+    \end{lstlisting}
 
+	  We are only searching for one record, hence we do need to apply GROUP BY and HAVING clause, instead we could directly search for the given record using the WHERE Clause.\\
+    Result: 1 record
+
+
+  \end{enumerate}
+\newpage
 \item 
  Can the view be used to execute the query? Explain in detail why the view can be used or why it cannot be used.
 
@@ -80,11 +132,15 @@ SELECT MatrNr, PID
 FROM Exam
 WHERE Grade = 1
 \end{verbatim}
-\end{minipage}
+\end{minipage}\\
+{\bf Solution:}\\
+The view only stores the result of the MatrNr and PID from the Exams table for Grade = 1, but the query which we are running is asking all the matriculation numbers from the exam tables less than 3.
+Hence the view cannot be used to execute the query.\\
+
+Output of query: 3 records\\
+Output of view: 1 record
 
 \end{enumerate}
-
-\newpage
 
 \question[1]{Min-Hashing}
 Implement Min-Hashing in a language of your choice.
@@ -109,14 +165,107 @@ The first should have less empty leaf nodes if inserted into a quadtree than if 
 The second one the other way around.
 
 Submit the points, the two insertion orders and draw the (PR) quadtrees. You can either draw them as tree or as the grid visualization.
+\newpage
 
+{\bf Solution:}\\
+The quadtree has less empty leave nodes than the pr-quadtree if the 8 points get inserted in the following order:
+$A(30,40); B(20, 75); C(78,75); D(10,10); E(80, 30); F(60, 5); G(90, 2); H(70, 35)$\\\\
+Quadtree:\\
+  \begin{tikzpicture}[level distance=1.5cm,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=3cm},
+  level 3/.style={sibling distance=3cm},
+  level 4/.style={sibling distance=3cm},
+  level 5/.style={sibling distance=3cm},
+  level 6/.style={sibling distance=3cm}]
+  \node[draw]{$30,40$}
+    child{node[draw]{20,75}}
+    child{node[draw]{78,75}}
+    child{node[draw]{10,10}}
+    child{
+      node[draw]{80,30}
+      child{node[draw]{70,35}}
+      child{node[draw]{60,5}}
+      child{node[draw]{90,2}}
+      child{node[draw]{null}}
+    };
+  \end{tikzpicture}
+
+PR-Quadtree:\\
+\begin{tikzpicture}[level distance=1.5cm,
+  level 1/.style={sibling distance=5cm},
+  level 2/.style={sibling distance=1cm},
+  level 3/.style={sibling distance=1.5cm}]
+  \node[draw]{$A$}
+    child{node[draw]{20,75}}
+    child{node[draw]{78,75}}
+    child{
+      node[draw]{B}
+      child{node[draw]{null}}
+      child{node[draw]{30,40}}
+      child{node[draw]{10,10}}
+      child{node[draw]{null}}
+      }
+    child{
+      node[draw]{C}
+      child{node[draw]{70,35}}
+      child{node[draw]{80,30}}
+      child{node[draw]{60,5}}
+      child{node[draw]{90,2}}};
+  \end{tikzpicture}
+
+  Changed order:
+  
+  $G(90, 2); D(10,10); A(30,40); F(60, 5); B(20, 75); C(78,75); E(80, 30); H(70, 35)$\\\\
+  Quadtree:\\
+  \begin{tikzpicture}[level distance=1.5cm,
+    level 1/.style={sibling distance=3cm},
+    level 2/.style={sibling distance=3cm},
+    level 3/.style={sibling distance=3cm},
+    level 4/.style={sibling distance=3cm},
+    level 5/.style={sibling distance=3cm},
+    level 6/.style={sibling distance=3cm}]
+    \node[draw]{$90, 2$}
+      child{
+        node[draw]{10,10}
+        child{node[draw]{null}}
+        child{
+          node[draw]{30,40}
+            child{node[draw]{20,75}}
+            child{node[draw]{78, 75}}
+            child{
+              node[draw]{80, 30}
+              child{node[draw]{70, 35}}
+              child{node[draw]{null}}
+              child{node[draw]{null}}
+              child{node[draw]{null}}}
+            }
+        child{node[draw]{60, 5}}
+        child{node[draw]{null}}
+      }
+      child{node[draw]{null}}
+      child{node[draw]{null}}
+      child{node[draw]{null}};
+  
+    \end{tikzpicture}
+
+    PR-Quadtree:
+    The PR-Quadtree is not relying on the order of the tree items. No mater what order is used the tree will be always the same. 
+  
 \item
 Assuming we have the whole dataset present upon insertion, describe one possible way that optimizes the creation of the quadtree, such that the height of the resulting quadtree is minimized.
 Note that before the bulk-loading, preprocessing of the data is allowed.
 
+{\bf Solution: }
+The data point that has the is the closesd to the average of the y koordinate and the x koordinate should be choosen to inserted first. From than on this gets repreated for each sub quadrant. until all the data is put into the tree structure.
+
 \item
   Assuming we are given uniformly distributed point data, what is the probability that a node at depth $k$ contains a particular point in a PR Quad tree? 
   Additionally, for a collection of $v$ points, calculate the probability that none of the points lies in a given cell at depth $k$? 
+
+{\bf Solution: }
+The probability is $1/4^{k}$ for a particular point.\\
+The probability that no point is inside a specific cell at the depth k is $(1-1/4^k)$
 
 \end{enumerate}
 
@@ -151,6 +300,54 @@ Note that before the bulk-loading, preprocessing of the data is allowed.
 
   Draw the result as a tree, like shown in the lecture.
   Note which values you used for the split.
+
+{\bf Solution:}\\\\
+\begin{tikzpicture}[level distance=1.5cm,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=3cm},
+  level 3/.style={sibling distance=3cm},
+  level 4/.style={sibling distance=3cm},
+  level 5/.style={sibling distance=3cm},
+  level 6/.style={sibling distance=3cm}]
+  \node[draw]{$\textcolor{red}{19},31,83$}
+    child{
+      node[draw]{$12,\textcolor{red}{92},55$} 
+        child{
+          node[draw]{$13,52,9$}
+          }
+          child[missing]
+        }
+    child{
+      node[draw]{$64,\textcolor{red}{27},97$} 
+        child{
+          node[draw]{$66,8,\textcolor{red}{101}$}
+            child{
+              node[draw]{$43,15,98$}
+            }
+            child[missing]
+          }
+        child{ 
+          node[draw]{$99,86,\textcolor{red}{34}$}
+            child{
+              node[draw]{$85,68,4$}
+            }
+            child{
+              node[draw]{$\textcolor{red}{76},39,85$}
+                child{
+                  node[draw]{$44,\textcolor{red}{39},91$}
+                  child{
+                    node[draw]{$29,35,57$}
+                  }
+                  child[missing]
+                }
+                child{
+                  node[draw]{$98,60,59$}
+                }
+            }
+          }
+          };
+  \end{tikzpicture}
+
 
 \item
 Adaptive kd tree
