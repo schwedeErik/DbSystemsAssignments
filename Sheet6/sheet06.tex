@@ -157,6 +157,12 @@ Submit the code and the output of your program when executed with the two data f
 If you do not use the template, also submit instructions on how to compile and execute your program.
 Do not submit the data files.
 
+{\bf Solution:}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale = 0.4]{MinHashOutput.PNG}
+\end{figure}
+
 \question[1]{Quadtrees}
 
 \begin{enumerate}
@@ -165,7 +171,6 @@ The first should have less empty leaf nodes if inserted into a quadtree than if 
 The second one the other way around.
 
 Submit the points, the two insertion orders and draw the (PR) quadtrees. You can either draw them as tree or as the grid visualization.
-\newpage
 
 {\bf Solution:}\\
 The quadtree has less empty leave nodes than the pr-quadtree if the 8 points get inserted in the following order:
@@ -302,51 +307,68 @@ The probability that no point is inside a specific cell at the depth k is $(1-1/
   Note which values you used for the split.
 
 {\bf Solution:}\\\\
-\begin{tikzpicture}[level distance=1.5cm,
-  level 1/.style={sibling distance=3cm},
-  level 2/.style={sibling distance=3cm},
-  level 3/.style={sibling distance=3cm},
-  level 4/.style={sibling distance=3cm},
-  level 5/.style={sibling distance=3cm},
-  level 6/.style={sibling distance=3cm}]
-  \node[draw]{$\textcolor{red}{19},31,83$}
-    child{
-      node[draw]{$12,\textcolor{red}{92},55$} 
-        child{
-          node[draw]{$13,52,9$}
-          }
-          child[missing]
-        }
-    child{
-      node[draw]{$64,\textcolor{red}{27},97$} 
-        child{
-          node[draw]{$66,8,\textcolor{red}{101}$}
-            child{
-              node[draw]{$43,15,98$}
-            }
-            child[missing]
-          }
-        child{ 
-          node[draw]{$99,86,\textcolor{red}{34}$}
-            child{
-              node[draw]{$85,68,4$}
-            }
-            child{
-              node[draw]{$\textcolor{red}{76},39,85$}
-                child{
-                  node[draw]{$44,\textcolor{red}{39},91$}
-                  child{
-                    node[draw]{$29,35,57$}
-                  }
-                  child[missing]
-                }
-                child{
-                  node[draw]{$98,60,59$}
-                }
-            }
-          }
-          };
-  \end{tikzpicture}
+\textbf{KD Tree implementation}
+
+\begin{tikzpicture}
+[
+squarednode/.style={rectangle, draw=blue!60, fill=green!5, very thick, minimum size=5mm},
+]
+
+%Nodes
+\node[squarednode]      (maintopic)                 {\textbf{1:} 19, 31, 83};
+\node[squarednode]      (leftchild)       [below left=of maintopic] {\textbf{5:} 12,92,55} ;   
+\node[squarednode]      (rightchild)      [below right=of maintopic] {\textbf{2:} 64,27,97};
+\node[squarednode]      (leftchild-L)      [below left=of leftchild] {\textbf{9:} 13,52,9} ; 
+\node[squarednode]      (R-LeftChild)     [below left=of rightchild] {\textbf{3: }66,8,101};
+\node[squarednode]      (R-RightChild)    [below right=of rightchild] {\textbf{4:} 99,86,34};
+\node[squarednode]      (R-LeftChild-L)   [below left = of R-LeftChild] {\textbf{12:} 43,15,98};
+\node[squarednode]     (R-RightChild-L)    [below left = of R-RightChild] {\textbf{7:} 85,68,4};
+\node[squarednode]     (R-RightChild-R)    [below right = of R-RightChild] {\textbf{6:} 76,39,85};
+\node[squarednode]     (R-RightChild-R-L)  [below left = of R-RightChild-R] {\textbf{10:} 44,39,91};
+\node[squarednode]     (R-RightChild-R-R) [below = of R-RightChild-R] {\textbf{8:} 98,60,59};
+\node[squarednode]     (R-RightChild-R-L-L) [below left = of R-RightChild-R-L] {\textbf{11: }29,35,57};
+
+
+%Lines
+\draw[->]  (maintopic) -- (leftchild);
+\draw[->]  (leftchild) -- (leftchild-L);
+\draw[->]  (maintopic) -- (rightchild);
+\draw[->]  (rightchild) -- (R-LeftChild);
+\draw[->]  (rightchild) -- (R-RightChild);
+\draw[->]   (R-RightChild) -- (R-RightChild-R);
+\draw[->]   (R-RightChild) --(R-RightChild-L);
+\draw[->] (R-RightChild-R) -- (R-RightChild-R-L);
+\draw[->] (R-RightChild-R) -- (R-RightChild-R-R);
+\draw[->] (R-RightChild-R-L) -- (R-RightChild-R-L-L);
+\draw[->] (R-LeftChild) -- (R-LeftChild-L);
+
+\end{tikzpicture}
+
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ Data Points & Split Value & Split Position \\ [0.5ex] 
+ \hline\hline
+ \hline
+  (19, 31, 83) & 19 & 0 \\ 
+ (64, 27, 97) & 64 & 0\\ 
+ (66, 8, 101) & 8 & 1 \\ 
+ (99, 86, 34) & 86 & 1 \\ 
+ (12, 92, 55) & 12 & 0 \\ 
+ (76, 39, 85) & 85 & 2\\ 
+ (85, 68, 4) & 4 & 2 \\ 
+ (98, 60, 59) & 98 & 0 \\ 
+ (13, 52, 9) & 52 & 1 \\ 
+ (44, 39, 91) & 44 & 0\\ 
+ (29, 35, 57) & 35 & 1\\ 
+ (43, 15, 98) & 98 & 2 \\ 
+ \hline
+\end{tabular}
+\\
+\newline
+\newline
+In the above table, we are considering the given data points/ co-ordinates as (X,Y,Z) and (0,1,2) to represent the split positions for the respective X,Y,Z values
+\\
+
 
 
 \item
@@ -356,6 +378,11 @@ Provide \textbf{in detail} an algorithm, in pseudo code, that takes a list of co
 This tree may have a maximum of ten data points in its leaves.
 The dimension used for the split should be the one with the largest variance.
 The value used for the split, should be the average of the split dimension of all relevant coordinates.
+
+{\bf Solution:}
+The Adaptive kd tree is the variant of KD Tree, where the partitioning is done not only 		on the basis of alternating dimensions, but also depends on data distribution. 
+Not sure of the algorithm 
+
 
 \end{enumerate}
 
