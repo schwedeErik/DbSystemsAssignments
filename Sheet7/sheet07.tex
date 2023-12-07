@@ -27,11 +27,24 @@ You can use the template in OLAT, which already parses the files and provides ut
 Submit the code and the output of your program when executed with $k = 3$ and the two data files provided in OLAT.
 If you do not use the template, also submit instructions on how to compile and execute your program.
 
-\textit{Note: } If you use code from external sources, provide the source as a comment. 
+\textit{Note: } If you use code from external sources, provide the source as a comment.\\
+
+{\bf Solution:}\\
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale = 0.6]{ZCurveOutput.PNG}
+\end{figure}
 
 \item
 Which differences can you see between the two results of your implementation?
-Explain why are or why are not the results the same.
+Explain why are or why are not the results the same.\\\\
+{\bf Solution:}\\
+Some of the actual k-NN are matching the k-NN according to the z-curve value, but not all of them.
+The z-curve mapping is only an approximation of the actual k-NN.\\
+
+Let's have a look at the points $A(0,0)$, $B(1,0)$, and $C(0,1)$. The real distance between $A$ and $B$ is $1$.
+Also, the z-value is $1$ in this case. The real distance between $A$ and $C$ is also $1$, but in this case, 
+the z-value is $2$. Because of the shape of the z-curve, the z-value is only an estimation of the real distance.
 
 \end{enumerate}
 

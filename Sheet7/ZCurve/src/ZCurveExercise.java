@@ -100,11 +100,19 @@ public class ZCurveExercise {
    * @return A list of k NN, of the query point, in the list of points
    */
   private static List<Point> getKNNZCurve(int k, List<Point> points, Point query) {
-    /////////////////////////////////////////
-    // TODO Your Code Here
-    /////////////////////////////////////////
-    System.out.println("getKNNZCurve function not implemented!");
-    return new ArrayList<Point>();
+
+    var zValueQueryPoint = query.calculateZValue();
+
+    // sort points according how close they are to the zValue of the query point.
+    var sortedPoints =   new ArrayList<Point>(points.stream().toList());
+    sortedPoints.sort((p1,p2) -> {
+      var difZ1 = Math.abs(zValueQueryPoint - p1.calculateZValue());
+      var difZ2 = Math.abs(zValueQueryPoint - p2.calculateZValue());
+      return Long.compare(difZ1, difZ2);
+    });
+
+
+    return sortedPoints.subList(0,k);
   }
 
   /**
@@ -148,7 +156,7 @@ public class ZCurveExercise {
 
       for(int i = 0; i < xBitValue.length(); i++)
       {
-      resultBitValue = resultBitValue + yBitValue.charAt(i) + xBitValue.charAt(i);
+        resultBitValue = resultBitValue + yBitValue.charAt(i) + xBitValue.charAt(i);
       }
 
       return Integer.parseInt(resultBitValue, 2);
