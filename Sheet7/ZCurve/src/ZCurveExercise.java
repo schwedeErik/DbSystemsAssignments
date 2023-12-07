@@ -86,11 +86,9 @@ public class ZCurveExercise {
    * @return A list of k NN, of the query point, in the list of points
    */
   private static List<Point> getKNN(int k, List<Point> points, Point query) {
-    /////////////////////////////////////////
-    // TODO Your Code Here
-    /////////////////////////////////////////
-    System.out.println("getKNN function not implemented!");
-    return new ArrayList<Point>();
+    var sortedPoints =   new ArrayList<Point>(points.stream().toList());
+    sortedPoints.sort((p1,p2) -> Double.compare(p1.distance(query),p2.distance(query)));
+    return sortedPoints.subList(0,k);
   }
 
   /**
@@ -135,11 +133,9 @@ public class ZCurveExercise {
      * @return The distance between this Point and Point o
      */
     public double distance(Point o) {
-      /////////////////////////////////////////
-      // TODO Calculate eucledian distance to point
-      /////////////////////////////////////////
-      System.out.println("Point::distance function not implemented!");
-      return 0;
+      //Distance between two points:
+      //  d = sqrt((x2-x1)^2 + (y2-y1)^2)
+      return Math.sqrt(Math.pow((o.x - x),2) + Math.pow((o.y - y),2));
     }
 
     /**
