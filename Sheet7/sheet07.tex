@@ -1,0 +1,202 @@
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 7}}
+\newcommand{\outdate}{04.12.2023}
+\newcommand{\duedate}{11.12.2023 12:00 MEZ}
+\newcommand{\video}{036}
+
+\usepackage{tkz-euclide}
+\begin{document}
+
+\input{../includes/header.tex}
+
+\question[1]{Space filling curves for NN-queries}
+\begin{enumerate}
+  \item 
+  Implement space-filling z-curves in a language of your choice.
+Your program has to take two files which contain points as input.
+The first file contains all the points of the base data set, while the second file contains query points.
+The program has to calculate and display:
+\begin{itemize}
+\item The k-NN, of each query point, in the base data set, based on the actual distance.
+\item The k-NN, of each query point, in the base data set, based on the z-curve distance.
+\end{itemize}
+
+You can use the template in OLAT, which already parses the files and provides utility classes.
+Submit the code and the output of your program when executed with $k = 3$ and the two data files provided in OLAT.
+If you do not use the template, also submit instructions on how to compile and execute your program.
+
+\textit{Note: } If you use code from external sources, provide the source as a comment. 
+
+\item
+Which differences can you see between the two results of your implementation?
+Explain why are or why are not the results the same.
+
+\end{enumerate}
+
+\newpage
+
+\question[1]{R Tree}
+
+Given the following two-dimensional objects:
+
+\begin{center}
+  \begin{tikzpicture}
+    \usetkzobj{all}
+
+    \draw[help lines, color=gray!30, dashed] (0,0) grid (10,6);
+
+    \draw (0,0) -- coordinate (x axis mid) (10,0);
+    \draw (0,0) -- coordinate (y axis mid) (0,6);
+
+    \foreach \x in {0,...,10} \draw (\x,1pt) -- (\x,-3pt) node[anchor=north] {\x};
+    \foreach \y in {0,...,6}  \draw (1pt,\y) -- (-3pt,\y) node[anchor=east] {\y};
+
+    \tkzDefPoint(1,1){f1a};
+    \tkzDefPoint(1,5){f1b};
+    \tkzDefPoint(2,5){f1c};
+    \tkzDefPoint(3,3){f1d};
+    \tkzDefPoint(2,1){f1e};
+
+    \tkzDrawPolygon[fill=purple!30](f1a,f1b,f1c,f1d,f1e);
+    \node at (barycentric cs:f1a=1,f1b=1,f1c=1,f1d=1,f1e=1) {F1};
+
+    \draw[fill=yellow!30] (4,5) circle (1);
+    \node at (4,5) {F2};
+
+    \tkzDefPoint(4,2){f3a};
+    \tkzDefPoint(5,3){f3b};
+    \tkzDefPoint(6,3){f3c};
+    \tkzDefPoint(6,2){f3d};
+    \tkzDefPoint(5,1){f3e};
+
+    \tkzDrawPolygon[fill=green!30](f3a,f3b,f3c,f3d,f3e);
+    \node at (barycentric cs:f3a=1,f3b=1,f3c=1,f3d=1,f3e=1) {F3};
+
+    \draw[fill=blue!30] (8,2) circle (1);
+    \node at (8,2) {F4};
+
+    \tkzDefPoint(6,4){f5a};
+    \tkzDefPoint(9,4){f5b};
+    \tkzDefPoint(9,6){f5c};
+    \tkzDefPoint(8,6){f5d};
+    \tkzDefPoint(8,5){f5e};
+    \tkzDefPoint(6,5){f5f};
+
+    \tkzDrawPolygon[fill=red!30](f5a,f5b,f5c,f5d,f5e,f5f);
+    \node at (barycentric cs:f5a=3,f5b=3,f5c=1,f5d=1,f5e=1,f5f=1) {F5};
+  \end{tikzpicture}
+\end{center}
+
+For the following R tree operations, explain exactly which steps are performed:
+
+\begin{enumerate}
+\item
+  {\em Store the objects F1, F2, F3, F4, F5 in an initially empty R tree}.
+ One node fits 1--2 entries.
+
+\item
+  {\em Find all objects, containing the point (6,2).}
+
+\item
+{\em Find all objects that are positioned completely in the rectangle $Q$, which is defied by the points $(2, 1) (9, 3)$.}
+
+\item
+  {\em Find all objects, intersecting with $Q'$: $(2,2) (4,4)$.}
+
+  We assume that sharing exactly one point, also counts as intersecting.
+
+\end{enumerate}
+
+\question[1]{Index Structures in Metric Space}
+
+Show, for each of the following distance functions, that the properties for being a metric are fulfilled, or provide a counterexample.
+
+    \begin{enumerate}
+
+   \item\label{l1} 
+   For two vectors (or points) $a=(x_a, y_a)$ and $b=(x_b, y_b)$:
+
+ $d(a, b) \mapsto | x_a - x_b | + | y_a - y_b |$.  
+
+  \item\label{l2} 
+For two vectors (or points) $a=(x_a, y_a)$ and $b=(x_b, y_b)$:
+ $d(a, b) \mapsto ( x_a - x_b )^2 + ( y_a - y_b )^2$.
+
+      \item\label{l3} 
+      For two strings $s_1$ and $s_2$, where $S$ is the set of characters of the string (e.g.: $S(\text{``Codd''}) = \{\text{`C', `o', `d'}\}$):
+      $d(s_1, s_2) \mapsto 2* |S(s_1) \cap S(s_2)| \, / \, (|S(s_1)| + |S(s_2)|)$.\\
+
+    \end{enumerate}
+
+\newpage
+\question[1]{Misc Metric Indexing}
+
+  Below are the points used for the following questions:
+\[
+1: (17, 29) \hspace{5mm}
+2: (4, 21) \hspace{5mm}
+3: (20, 29) \hspace{5mm}
+4: (4, 36) \hspace{5mm}
+5: (35, 28)
+\]
+\[
+6: (39, 22) \hspace{5mm}
+7: (30, 5) \hspace{5mm}
+8: (8, 36) \hspace{5mm}
+9: (6, 2) \hspace{5mm}
+10: (20, 4)
+\]
+\[
+11: (4, 6) \hspace{5mm}
+12: (29, 32) \hspace{5mm}
+13: (22, 33) \hspace{5mm}
+14: (38, 18) \hspace{5mm}
+15: (16, 25)
+\]
+
+\begin{enumerate}
+  \item \textbf{GH Tree partitioning:} 
+    Create a GH partitioning, such that the leaf nodes of the tree have at most $2$ elements.
+    Draw the tree and draw the partitioning into the plot below.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[ymin = 0, xmin = 0]
+  \addplot+[nodes near coords,only marks,
+    point meta=explicit symbolic] 
+  coordinates {
+(17, 29) [1] 
+(4, 21) [2] 
+(20, 29) [3] 
+(4, 36) [4] 
+(35, 28) [5] 
+(39, 22) [6] 
+(30, 5) [7] 
+(8, 36) [8] 
+(6, 2) [9] 
+(20, 4) [10]
+(4, 6) [11]
+(29, 32) [12]
+(22, 33) [13]
+(38, 18) [14]
+(16, 25) [15]
+  };
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\item \textbf{VP Tree:}
+Given the following VP tree, search for query point (25,4) with $\varepsilon = 11$.
+Describe which parts of the tree you pruned and why.
+
+\begin{center}
+  \begin{tikzpicture}[every text node part/.style={align=center},level 1/.style={sibling distance=60mm},level 2/.style={sibling distance=30mm},level 3/.style={sibling distance=15mm}]
+\node { 7\\(30, 5)\\$r=26.01$ } child {node { 14\\(38, 18)\\$r=21.95$ } child {node { 6\\(39, 22)\\$r=13.73$ } child {node { 5\\(35, 28) }} child {node { 3\\(20, 29) }}} child {node { 15\\(16, 25)\\$r=23.23$ } child {node { 10\\(20, 4) }} child {node { 9\\(6, 2) }}}} child {node { 1\\(17, 29)\\$r=13.57$ } child {node { 8\\(8, 36)\\$r=17.85$ } child {node { 13\\(22, 33) }} child {node { 12\\(29, 32) }}} child {node { 4\\(4, 36)\\$r=22.5$ } child {node { 2\\(4, 21) }} child {node { 11\\(4, 6) }}}};
+  \end{tikzpicture}
+  \end{center}
+
+\end{enumerate}
+
+\end{document}
