@@ -142,11 +142,16 @@ public class ZCurveExercise {
      * @return the ZCurve value of the given point
      */
     public long calculateZValue() {
-      /////////////////////////////////////////
-      // TODO calculateZValue
-      /////////////////////////////////////////
-      System.out.println("Point::getKNNZCurve function not implemented!");
-      return 0;
+      var xBitValue = String.format("%32s",Integer.toBinaryString(x)).replaceAll(" ", "0");
+      var yBitValue = String.format("%32s",Integer.toBinaryString(y)).replaceAll(" ", "0");
+      String resultBitValue = "";
+
+      for(int i = 0; i < xBitValue.length(); i++)
+      {
+      resultBitValue = resultBitValue + yBitValue.charAt(i) + xBitValue.charAt(i);
+      }
+
+      return Integer.parseInt(resultBitValue, 2);
     }
   }
 
