@@ -108,9 +108,8 @@ For the following R tree operations, explain exactly which steps are performed:
   {\em Store the objects F1, F2, F3, F4, F5 in an initially empty R tree}.
   One node fits 1--2 entries.\\\\
   {\bf Solution:}\\
-  The objects get inserted one after the other in theory they can be inserted in any node.
-  I decided for the following insertion order: F1, F5, F4, F2, F3.
-  F1 and F5 get inserted into the tree.\\
+  The objects get inserted one after the other; in theory, they can be inserted in any node. 
+  I decided for the following insertion order: F1, F5, F4, F2, F3. F1 and F5 get inserted into the tree.\\
 \begin{center}
   \begin{tikzpicture}[level distance=1.5cm,
     level 1/.style={sibling distance=3cm}]
@@ -121,15 +120,14 @@ For the following R tree operations, explain exactly which steps are performed:
 \end{center}
   
 
-  R1 is the smalest rectangle that fits around F1 and R2 is the smalest rectangle that fits arround F5
-  Insertion of F4:\\
-  Calculate the arrea differences of R1 if F4 gets inserted into R1 and calculate the area difference of R2 if F4 gets inserted.\\\\
+R1 is the smallest rectangle that fits around F1, and R2 is the smallest rectangle that fits around F5. Insertion of F4:\\
+Calculate the area differences of R1 if F4 gets inserted into R1 and calculate the area difference of R2 if F4 gets inserted.\\\\
   \begin{center}
     $A_{R1} = 8 \cdot 4 - 2 \cdot 4 = 24$\\
     $A_{R2} = 5 \cdot 3 - 6 \cdot 4 = 9$
   \end{center}
     
-  Insert F4 int R2 because the area increase is smaler then when inserted into R2\\\\
+  Insert F4 int R2 because the area increase is smaller then when inserted into R2\\\\
   \begin{center}
     \begin{tikzpicture}[level distance=1.5cm,
       level 1/.style={sibling distance=3cm}]
@@ -139,13 +137,13 @@ For the following R tree operations, explain exactly which steps are performed:
     \end{tikzpicture}
   \end{center}
   Insertion of F2:\\
-  Calculate the arrea differences of R1 if F2 gets inserted into R1 and calculate the area difference of R2 if F2 gets inserted.\\\\
+  Calculate the area differences of R1 if F2 gets inserted into R1 and calculate the area difference of R2 if F2 gets inserted.\\\\
   \begin{center}
     $A_{R1} = 4 \cdot 5 - 2 \cdot 4 = 12$\\
     $A_{R2} = 5 \cdot 3 - 3 \cdot 5 = 15$
   \end{center}
     
-  Insert F2 int R1 because the area increase is smaler then when inserted into R1\\\\
+  Insert F2 int R1 because the area increase is smaller then when inserted into R1\\\\
   \begin{center}
     \begin{tikzpicture}[level distance=1.5cm,
       level 1/.style={sibling distance=3cm}]
@@ -160,9 +158,9 @@ For the following R tree operations, explain exactly which steps are performed:
     $A_{R1} = 5 \cdot 5 - 4 \cdot 5 = 5$\\
     $A_{R2} = 5 \cdot 5 - 3 \cdot 5 = 10$
   \end{center}
-  Insert F2 int R1 because the area increase is smaler then when inserted into R1. The maximum of objects in R1 is already reached. 
-  In order to insert F2 R1 needs to be split into two rectangles. The size of the two newly created rectangels R3 and R4 should be minimal in the optimal case.\\
-  Calculation of the area of all posible split combinations:\\\\
+  Insert F2 int R1 because the area increase is smaller then when inserted into R1. The maximum of objects in R1 is already reached. 
+  In order to insert F2 R1 needs to be split into two rectangles. The size of the two newly created rectangles R3 and R4 should be minimal in the optimal case.\\
+  Calculation of the area of all possible split combinations:\\\\
   \begin{center}
     $R3[F1, F2], R4[F3]$ $A = 4 \cdot 5 + 2 \cdot 2 = 24$\\
     $R3[F1, F3], R4[F2]$ $A = 5 \cdot 4 + 2 \cdot 2 = 24$\\
@@ -266,16 +264,16 @@ For the following R tree operations, explain exactly which steps are performed:
     \end{center}
 \item
   {\em Find all objects, containing the point (6,2).}\\\\
-  {\bf Solution:}\\\\
+  {\bf Solution:}\\
   Step by step execution:\\
   \subitem
   Scan the root of the tree (R1,R2)
   \subitem
-  Check if (6,2) is in R1 $\Rightarrow$ true $\Rightarrow$ put R3 and R4 in the que
+  Check if (6,2) is in R1 $\Rightarrow$ true $\Rightarrow$ put R3 and R4 in the queue
   \subitem
-  Check if (6,2) is in R2 $\Rightarrow$ true $\Rightarrow$ put F5 and F4 in the que
+  Check if (6,2) is in R2 $\Rightarrow$ true $\Rightarrow$ put F5 and F4 in the queue
   \subitem
-  Check if (6,2) is in R3 $\Rightarrow$ true $\Rightarrow$ put F2 and F3 in the que
+  Check if (6,2) is in R3 $\Rightarrow$ true $\Rightarrow$ put F2 and F3 in the queue
   \subitem
   Check if (6,2) is in R4 $\Rightarrow$ false
   \subitem
@@ -285,17 +283,83 @@ For the following R tree operations, explain exactly which steps are performed:
   \subitem
   Check if (6,2) is in F2 $\Rightarrow$ false
   \subitem
-  Check if (6,2) is in F3 $\Rightarrow$ true $\Rightarrow$ leafnode $\Rightarrow$ add F3 to the query result
-  \subitem
-  (6,2) is only in object F3
+  Check if (6,2) is in F3 $\Rightarrow$ true $\Rightarrow$ leaf node $\Rightarrow$ add F3 to the query result
+  {\subitem
+  (6,2) is only in object F3}\\\\
+  To check if a point is inside a rectangle we have to check the borders of the rectangle. Lets say R is defined as $R((x_1,y_1),(x_2,y_2))$
+  and P is defined as $P(x,y)$. 
+  Then the following conditions must be true.
+  \begin{center}
+    $x_1 \leq x $\\
+    $y_1 \leq y $\\
+    $x_2 \geq x $\\
+    $y_2 \geq y $\\
+  \end{center}
 
 \item
-{\em Find all objects that are positioned completely in the rectangle $Q$, which is defied by the points $(2, 1) (9, 3)$.}
-
+{\em Find all objects that are positioned completely in the rectangle $Q$, which is defied by the points $(2, 1) (9, 3)$.}\\\\
+{\bf Solution:}\\
+Step by step execution:\\
+  \subitem
+  Scan the root of the tree (R1,R2)
+  \subitem
+  Check if $Q$ is intersecting with R1 $\Rightarrow$ true $\Rightarrow$ put R3 and R4 in the queue
+  \subitem
+  Check if $Q$ is intersecting with R2 $\Rightarrow$ true $\Rightarrow$ put F5 and F4 in the queue
+  \subitem
+  Check if $Q$ is intersecting with R3 $\Rightarrow$ true $\Rightarrow$ put F2 and F3 in the queue
+  \subitem
+  Check if rectangle of F5 is fitting fully into $Q$ $\Rightarrow$ false
+  \subitem
+  Check if rectangle of F4 is fitting fully into $Q$ $\Rightarrow$ true $\Rightarrow$ leaf node $\Rightarrow$ add F4 to the result
+  \subitem
+  Check if rectangle of F2 is fitting fully into $Q$ $\Rightarrow$ false
+  \subitem
+  Check if rectangle of F3 is fitting fully into $Q$ $\Rightarrow$ true $\Rightarrow$ leaf node $\Rightarrow$ add F3 to the result
+  \subitem
+  Check if rectangle of F1 is fitting fully into $Q$ $\Rightarrow$ false
+  {\subitem
+  F4 and F3 are the result of the query}\\\\
+  To ensure that a rectangle is fully inside the other the following conditions have to be true.
+  \begin{center}
+    $ Q((x_{q1},y_{q1}),(x_{q2},y_{q2}))$ The query rectangle\\
+    $ R((x_{r1},y_{r1}),(x_{r2},y_{R2}))$ The rectangle the query should be inside\\
+    $ x_{r1} \leq x_{q1}$\\
+    $ y_{r1} \leq y_{q1}$\\
+    $ x_{r2} \geq x_{q2}$\\
+    $ y_{r2} \geq y_{q2}$\\
+  \end{center}
+  To ensure that Q is intersecting with R the following conditions have to be fulfilled.
+  \begin{center}
+    $ x_{r1} \leq x_{q2}$\\
+    $ y_{r1} \leq y_{q2}$\\
+    $ x_{r2} \geq x_{q1}$\\
+    $ y_{r2} \geq y_{q1}$\\
+  \end{center}
 \item
   {\em Find all objects, intersecting with $Q'$: $(2,2) (4,4)$.}
 
-  We assume that sharing exactly one point, also counts as intersecting.
+  We assume that sharing exactly one point, also counts as intersecting.\\\\
+  {\bf Solution:}\\
+Step by step execution:\\
+  \subitem
+  Scan the root of the tree (R1,R2)
+  \subitem
+  Check if $Q$ is intersecting with R1 $\Rightarrow$ true $\Rightarrow$ put R3 and R4 in the queue
+  \subitem
+  Check if $Q$ is intersecting with R2 $\Rightarrow$ false
+  \subitem
+  Check if $Q$ is intersecting with R3 $\Rightarrow$ true $\Rightarrow$ put F2 and F3 in the queue
+  \subitem
+  Check if $Q$ is intersecting with R4 $\Rightarrow$ true $\Rightarrow$ put F1 in the queue
+  \subitem
+  Check if $Q$ is intersecting with F2 $\Rightarrow$ true $\Rightarrow$ leaf $\Rightarrow$ add F2 to the query result
+  \subitem
+  Check if $Q$ is intersecting with F3 $\Rightarrow$ true $\Rightarrow$ leaf $\Rightarrow$ add F3 to the query result
+  \subitem
+  Check if $Q$ is intersecting with F1 $\Rightarrow$ true $\Rightarrow$ leaf $\Rightarrow$ add F1 to the query result
+  {\subitem
+  F2, F3 and F1 are the result of the query}
 
 \end{enumerate}
 
