@@ -1,6 +1,11 @@
+import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ExtendibleHashing {
@@ -139,9 +144,26 @@ class Directory {
   private int maxBucketSize; // Maximum Bucket size
   private int d = 0; // Global Depth
 
+  private HashMap<String,DirectoryPointer> directoryBuckets;
+
+
   Directory(int maxBucketSize) {
     System.out.println("Initialized Directory with maximum bucket size: " + maxBucketSize);
     this.maxBucketSize = maxBucketSize;
+    this.directoryBuckets = new HashMap<>();
+  }
+
+  public static String kBitsToString(byte value, int depth) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 7; i >= 8-depth; i--) {
+      if((value & (1 << i)) != 0)
+      {
+        result.append("1");
+        continue;
+      }
+      result.append("0");
+    }
+    return result.toString();
   }
 
   /**
@@ -154,6 +176,43 @@ class Directory {
    */
   void addEntry(byte hash, String data) {
     System.out.println("Inserting '" + data + "' with hash value " + ExtendibleHashing.getBooleanString(hash));
+
+    //check global depth
+    //take the first d bits from the hash
+    var directoryKey = kBitsToString(hash,d);
+    //check the entry in the directory for that d bit sequence
+    //go to the bucket it points too
+
+    var dirBucket = directoryBuckets.get(directoryKey);
+    if(dirBucket == null)
+    {
+      dirBucket = new DirectoryPointer(directoryKey,new DataBucket(directoryKey,maxBucketSize));
+      directoryBuckets.put(directoryKey, dirBucket);
+    }
+    dirBucket.dataBucket.Data.add(data);
+
+
+
+
+
+
+    //check if the buckte exedet the maxBucketSize
+    // no -> add the item to the bucket
+    // yes -> split the bucket by increasing the depth of the bucket
+    // check if the new depth exieds the global depth
+    // yes -> increase the global depth
+    // no -> everything is fine
+
+
+
+
+
+
+
+
+
+
+
 
     /////////////////////////////////////////////////////////////////////
     // TODO: Your code here!
@@ -181,4 +240,41 @@ class Directory {
 
     return "";
   }
+}
+
+class DataBucket
+{
+  public int maxItems;
+  public String key;
+  public List<String> Data;
+
+  DataBucket(String key, int maxItems)
+  {
+    this.key  = key;
+    this.maxItems = maxItems;
+    this.Data = new ArrayList<>();
+  }
+
+  public int GetC()
+  {
+    return key.length();
+  }
+}
+
+class DirectoryPointer
+{
+  public String key;
+  public DataBucket dataBucket;
+
+  public int GetD()
+  {
+    return key.length();
+  }
+
+  DirectoryPointer(String key, DataBucket dataBucket)
+  {
+    this.key = key;
+    this.dataBucket = dataBucket;
+  }
+
 }
