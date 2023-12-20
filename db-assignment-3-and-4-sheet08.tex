@@ -1,0 +1,666 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{xcolor} % Required for adding colors to text
+
+\begin{document}
+
+\newpage
+
+\textbf{3) Linear Hashing}
+
+Perform linear hashing for the following given parameters:
+
+Using the following sequence of hash functions:
+\[
+H_i(K) = K \mod (2 \cdot 2^i) \textnormal{ with } i \in \{0, 1, 2, \dots, n\}
+\]
+
+The hash table should be initialized with 2 buckets.
+Each bucket has a capacity of 3 entries.
+If more than $\beta > \frac{2}{3}$ of the table is occupied, controlled splitting should be performed.
+
+Insert the following values in the given order:
+
+\[
+27, 13, 28, 3, 21, 8, 27, 16, 36
+\]
+
+Write down what happens during each insert. Also visualize your buckets after every split.
+\\
+
+\textbf{Solution:}
+
+Number of buckets to be considered ,\textbf{N = 2}
+
+Number of records per bucket to be considered, \textbf{b=3}
+
+Given \textbf{hash function} to be considered 
+
+    \[H_i(K) = K \mod (2 \cdot 2^i) \textnormal{ with } i \in \{0, 1, 2, \dots, n\}\]
+
+Given threshold = $\beta_s = 2/3 = 0.66$
+
+Number of values inserted into buckets, \textbf{x = 8}
+
+As we are using Linear hashing, we would have a pointer\textbf{ p}, pointing to the first bucket initially and follows the round robin fashion to split the buckets.
+After applying the hash function, the output of the hash function would be the bucket numbers the values would be placed into.
+\[\textbf{Values: 27, 13, 28, 3, 21, 8, 27, 16, 36}\]
+
+\textbf{(i) Inserting 27 in the bucket and i=0}
+\[H_0(27) = 27 mod (2 \cdot 2^0)\]
+\[H_0(27) = 27 mod (2 \cdot 1) = 27 mod 2 = 1\] 
+\\
+
+
+\begin{tabular}{ |c|c| } 
+ \hline
+  \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 \\ [0.5ex] 
+ \hline\hline
+ \hline
+   & 27 \\ 
+   & 
+   & 
+ \hline
+\end{tabular}
+
+\textbf{(ii) Inserting 13 in the bucket}
+\[H_0(13) = 13 mod (2 \cdot 1)  = 13 mod 2 = 1\] 
+
+\begin{tabular}{ |c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 \\ [0.5ex] 
+ \hline\hline
+ \hline
+   & 27 \\ 
+   & 13
+   & 
+ \hline
+\end{tabular}
+
+\newpage
+
+\textbf{(iii) Inserting 28 in the bucket}
+\[H_0(28) = 28 mod (2 \cdot 1)  = 28 mod 2 = 0\] 
+
+\begin{tabular}{ |c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 \\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 27 \\ 
+   & 13   \\
+   &      \\
+ \hline
+\end{tabular}
+
+
+\textbf{(iv) Inserting 3 in the bucket}
+\[H_0(3) = 3 mod (2 \cdot 1)  = 3 mod 2 = 1\] 
+
+\begin{tabular}{ |c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 \\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 27 \\ 
+   & 13   \\
+   & 3 \\
+ \hline
+\end{tabular}
+
+\textbf{(v) Inserting 21 in the bucket}
+\[H_0(21) = 21 mod (2 \cdot 1)  = 21 mod 2 = 1\] 
+
+\begin{tabular}{ |c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 \\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 27 \\ 
+   & 13   \\
+   & 3 \\
+ \hline
+    & \textbf{\textcolor{blue}{21}}
+    
+\end{tabular}
+\\
+
+The bucket 1 is full and hence the value of 21 goes to the overflow bucket. 
+We have to calculate the value of $\beta$
+
+\[\beta = x/(b \times M)\]
+\[\beta = 5/(2 \times 3) = 5/6 = 0.83\]
+
+But $\beta_s = 0.66 , \beta>\beta_s$,\textbf{ hence the controlled splitting must be performed}. The pointer points to bucket 0, and hence we \textbf{split the bucket 0 into bucket 0 and bucket 2.} Bucket 0 and Bucket 2 follow $H_1$ and bucket 1 follows $H_0$
+\\
+\\
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ BUCKET 0 & \textbf{\color{red}{P}} BUCKET 1 & BUCKET 2\\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 27 & \\ 
+   & 13 & \\
+   & 3 & \\
+ \hline
+ \hline
+\textbf{\textcolor{magenta}{h1}} & \textbf{\textcolor{teal}{h0}}& \textbf{\textcolor{magenta}{h1}}\\ [0.5ex] 
+ \hline
+     & \textbf{\textcolor{blue}{21}}
+\end{tabular}
+
+\newpage
+
+Apply $H_1$ function to the values that are already present in \textbf{BUCKET 0}
+\[H_1(28) = 28 mod (2 \cdot 2.2^1)  = 28 mod 4 = 0\]
+
+After $H_1$ function, the value of 28 remains in bucket 0.
+
+
+\textbf{(vi) Inserting 8 in the bucket}
+\[H_0(8) = 8 mod (2 \cdot 1)  = 8 mod 2 = 0\]
+    p is the pointer pointing to bucket 1, and therefore the value of \textbf{p=1}
+\[H_0(8)\ge p = False\]
+
+\[H_0(8) < p = 0 < 1 = True\]
+
+Hence use $H_1$ function to place the value of 8 in bucket
+\[H_1(8) = 8 mod (2 \cdot 2.2^1)  = 8 mod 4 = 0\]
+
+
+
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ BUCKET 0 & \textbf{\color{red}{P}} BUCKET 1 & BUCKET 2\\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 27 & \\ 
+   8 & 13 & \\
+   & 3 & \\
+ \hline
+ \hline
+\textbf{\textcolor{magenta}{h1}} & \textbf{\textcolor{teal}{h0}}& \textbf{\textcolor{magenta}{h1}}\\ [0.5ex] 
+ \hline
+     & \textbf{\textcolor{blue}{21}}
+\end{tabular}
+
+\textbf{(vii) Inserting 27 in the bucket}
+
+For the upcoming values, we don't know if it belongs to $H_0$ or $H_1$ and hence we apply {H_0} first.
+
+\[H_0(27) = 27 mod (2 \cdot 1)  = 27 mod 2 = 1\] 
+
+The bucket 1 is full and hence the value of 27 goes to the overflow bucket.
+
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ BUCKET 0 & \textbf{\color{red}{P}} BUCKET 1 & BUCKET 2\\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 27 & \\ 
+   8 & 13 & \\
+   & 3 & \\
+ \hline
+ \hline
+\textbf{\textcolor{magenta}{h1}} & \textbf{\textcolor{teal}{h0}}& \textbf{\textcolor{magenta}{h1}}\\ [0.5ex] 
+ \hline
+     & \textbf{\textcolor{blue}{21}}\\ 
+     & \textbf{\textcolor{blue}{27}}
+\end{tabular}
+\\
+\\
+We have to calculate the value of $\beta$
+
+\[\beta = x/(b \times M)\]
+\[\beta = 7/(3 \times 3) = 7/9 = 0.77\]
+
+But $\beta_s = 0.66 , \beta>\beta_s$,\textbf{ hence the controlled splitting must be performed}. The pointer points to bucket 1, and hence we \textbf{split the bucket 1 into bucket 1 and bucket 3.}Now that all the buckets are split doubly, the pointer moves back to bucket 0 as per round robin fashion and \textbf{all the buckets follow $H_1$ function} and \textbf{$H_0$ function is eliminated.}
+
+
+\newpage
+
+$H_1$ function is applied to all the values that are present previously in the table and the values get reshuffled due to this.
+
+\[H_1(27) = 27 mod (2 \cdot 2.2^1)  = 27 mod 4 = 3\]
+\[H_1(13) = 13 mod (2 \cdot 2.2^1)  = 13 mod 4 = 1\]
+\[H_1(28) = 28 mod (2 \cdot 2.2^1)  = 28 mod 4 = 0\]
+\[H_1(3) = 3 mod (2 \cdot 2.2^1)  = 3 mod 4 = 3\]
+\[H_1(21) = 21 mod (2 \cdot 2.2^1)  = 21 mod 4 = 1\]
+\[H_1(8) = 8 mod (2 \cdot 2.2^1)  = 8 mod 4 = 0\]
+\[H_1(27) = 27 mod (2 \cdot 2.2^1)  = 27 mod 4 = 3\]
+
+\\
+\\
+\\
+
+\begin{tabular}{ |c|c|c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 & BUCKET 2 & BUCKET 3\\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 13 &  &27\\ 
+   4 & 21 &  &3\\
+    &  &  &\\
+ \hline
+ \hline
+\textbf{\textcolor{magenta}{h1}} & \textbf{\textcolor{magenta}{h1}}& \textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{magenta}{h1}}\\ [0.5ex] 
+ \hline
+\end{tabular}
+\\
+\\
+\textbf{(viii) Inserting 16 in the bucket}
+\[H_1(16) = 16 mod (2 \cdot 2.2^1)  = 16 mod 4 = 0\]
+
+\begin{tabular}{ |c|c|c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 & BUCKET 2 & BUCKET 3\\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 13 &  &27\\ 
+   4 & 21 &  &3\\
+    16 &  &  &\\
+ \hline
+ \hline
+\textbf{\textcolor{magenta}{h1}} & \textbf{\textcolor{magenta}{h1}}& \textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{magenta}{h1}}\\ [0.5ex] 
+ \hline
+\end{tabular}
+
+\textbf{(ix) Inserting 36 in the bucket}
+\[H_1(36) = 36 mod (2 \cdot 2.2^1)  = 36 mod 4 = 0\]
+
+The bucket 0 is full and hence the value of 27 goes to the overflow bucket.
+\\
+\\
+\begin{tabular}{ |c|c|c|c| } 
+ \hline
+ \textbf{\color{red}{P}} BUCKET 0 & BUCKET 1 & BUCKET 2 & BUCKET 3\\ [0.5ex] 
+ \hline\hline
+ \hline
+  28 & 13 &  &27\\ 
+   4 & 21 &  &3\\
+    16 &  &  &\\
+ \hline
+ \hline
+\textbf{\textcolor{magenta}{h1}} & \textbf{\textcolor{magenta}{h1}}& \textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{magenta}{h1}}\\ [0.5ex] 
+ \hline
+ \textbf{\textcolor{blue}{36}}
+\end{tabular}
+\\
+\\
+We have to calculate the value of $\beta$
+
+\[\beta = x/(b \times M)\]
+\[\beta = 9/(4 \times 3) = 9/12 = 0.75\]
+
+But $\beta_s = 0.66 , \beta>\beta_s$,\textbf{ hence the controlled splitting must be performed}. The pointer points to bucket 0, and hence we \textbf{split the bucket 0 into bucket 0 and bucket 4.}Bucket 0 and Bucket 4 follow $H_2$ function and bucket1, bucket 2 and bucket 3 follows $H_1$ function.
+
+Apply $H_2$ for the existing elements of the bucket 0
+\\
+\\
+
+\begin{tabular}{ |c|c|c|c|c|} 
+ \hline
+  BUCKET 0 & \textbf{\color{red}{P}} BUCKET 1 & BUCKET 2 & BUCKET 3 & BUCKET 4\\ [0.5ex] 
+ \hline\hline
+ \hline
+  16 & 13 &  & 27& 28\\ 
+    & 21 &  & 3& 4\\
+     &  &  &  &\\
+ \hline
+ \hline
+\textbf{\textcolor{cyan}{h2}} & \textbf{\textcolor{magenta}{h1}}& \textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{cyan}{h2}}\\ [0.5ex] 
+ \hline
+ \textbf{\textcolor{blue}{36}}
+\end{tabular}
+
+
+Applying $H_2$ function for 36 we get
+\[H_2(36) = 36 mod (2 \cdot 2.2^2)  = 36 mod 8 = 4\]
+
+Final output of values in the buckets are as follows
+\\
+\\
+\begin{tabular}{ |c|c|c|c|c|} 
+ \hline
+  BUCKET 0 & \textbf{\color{red}{P}} BUCKET 1 & BUCKET 2 & BUCKET 3 & BUCKET 4\\ [0.5ex] 
+ \hline\hline
+ \hline
+  16 & 13 &  & 27& 28\\ 
+    & 21 &  & 3& 4\\
+     &  &  &  &36\\
+ \hline
+ \hline
+\textbf{\textcolor{cyan}{h2}} & \textbf{\textcolor{magenta}{h1}}& \textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{magenta}{h1}}&\textbf{\textcolor{cyan}{h2}}\\ [0.5ex] 
+ \hline
+\end{tabular}
+\newpage
+\textbf{4) Top-k Algorithms}
+\\
+Apply the FA and TA algorithm for $k=2$, using addition as aggregation function, on the following three index lists.
+ Write down all index list accesses, as well as the current top-$k$ documents after each step.
+ How many sequential and how many random accesses were executed?
+
+  \begin{table}[h]
+    \begin{center}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.5$\\\hline
+          $d_6 \, \, 0.4$\\\hline
+          $d_5 \, \, 0.3$\\\hline
+          $d_8 \, \, 0.2$\\\hline
+          $d_7 \, \, 0.1$\\\hline
+        \end{tabular}
+      \end{minipage}
+      \hspace{5mm}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+          $d_3 \, \, 0.5$\\\hline
+          $d_6 \, \, 0.4$\\\hline
+          $d_8 \, \, 0.3$\\\hline
+          $d_4 \, \, 0.3$\\\hline
+          $d_7 \, \, 0.1$\\\hline
+        \end{tabular}
+      \end{minipage}
+      \hspace{5mm}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_3$\\\hline
+          $d_3 \, \, 0.9$\\\hline
+          $d_4 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.6$\\\hline
+          $d_2 \, \, 0.4$\\\hline
+          $d_5 \, \, 0.3$\\\hline
+          $d_7 \, \, 0.2$\\\hline
+          $d_8 \, \, 0.2$\\\hline
+        \end{tabular}
+      \end{minipage}
+    \end{center}
+  \end{table}
+
+\textbf{Solution:} 
+\\
+\textbf{(i) Fagin's Algorithm}
+
+For k=2, we do sequential reads until we find all top 2 values as k=2.
+
+Aggregation function: \textbf{sum}
+
+    \begin{center}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.5$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+          $d_3 \, \, 0.5$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline
+        $d_4 \, \, 0.8$\\\hline
+        $d_1 \, \, 0.6$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+\\
+
+
+Calculating the values of the documents
+
+For the pages that are not in the sequential scan, we consider as 0 by default.
+\[d1 = 0.5 + 0.8 + 0.6 = 1.9 \] 
+\[d2 = 0.9 + 0.7 + 0 = 1.6 \]
+\[d3 = 0.8 + 0.5 + 0.9 = 2.2 \]
+
+Top values of k=2 so far are \textbf{d3,d1}
+We have performed 3 sequential reads per row in the index list, hence we have performed \textbf{9 sequential reads} on the whole so far.
+
+There are possibilities that the partially scanned documents might have the better values and henc we perform random access on the partially scanned documents.
+
+\[d2 = 0.9 + 0.7 + 0.4 = 2 \]  
+\[d1 = 0 + 0.3 + 0.8 = 1.1 \] 
+
+$d_2$ takes 2 random scans, one for L1 and other for L2. d4 takes one random scan, summing up to 3 random scans.
+As, $d_2$ value is greater than $d_1$, we consider $d_2$ to be the top element along with $d_3$
+\newpage
+
+Hence, \textbf{{d3,d2}} are the top 2 documents for k=2. 
+
+\textbf{Sequential accesses executed : 9}
+
+\textbf{Random accesses executed : 3}
+\\
+
+\textbf{(ii) Threshold Algorithm}:  Read sequentially from each index list and perform random reads for every document found in the sequence list. We compare the threshold of the aggregated values of the documents with the scan line score. When the value of \textbf{aggregated values $>$ scan line score}, then we terminate the algorithm.
+\\
+\\
+
+\begin{center}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+            \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline      
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+    
+\begin{tabular}{ |c|c| } 
+ \hline
+  \textbf{SEQUENTIAL ACCESS} & \textbf{RANDOM ACCESS}  \\ [0.5ex] 
+ \hline\hline
+ \textbf{ L1: $d_2$ 0.9} &  \textbf{L2:} $d_2$ 0.7, \textbf{L3:} $d_2$ 0.4 \\ 
+  \hline
+  \textbf{ L2: $d_1$ 0.8} &  \textbf{L1:} $d_1$ 0.5,\textbf{ L3:} $d_1$ 0.6 \\
+  \hline
+   \textbf{ L3: $d_3$ 0.9} & \textbf{ L2:} $d_3$ 0.8, \textbf{L3:} $d_3$ 0.5 \\
+ \hline
+\end{tabular}
+\\
+
+Aggregation sum of the documents:
+\[d2 = 0.9 + 0.7 + 0.4 = 2 \]
+\[d1 = 0.8 + 0.5 + 0.6 = 1.9 \] 
+\[d3 = 0.9 + 0.8 + 0.5 = 2.2 \]
+
+Scan line score = L1 + L2 + L3 = 0.9 + 0.8 + 0.9 = 2.6
+
+Current top-k: \textbf\{{d3,d2}\}
+
+The aggregated values of\textbf{ d3 and d2 $<$ scan line score} - continue algorithm
+\\
+\textbf{Sequential access for L1: d3 0.8}
+\\
+\begin{center}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+            \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline      
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+
+ Scan line score = 0.8 + 0.8 + 0.9 = 2.5
+
+ The aggregated values of\textbf{ d3 and d2 $<$ scan line score} - continue algorithm
+\\
+\textbf{Sequential access for L2: d2 0.7}
+ \begin{center}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+            \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline      
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+\newpage
+
+Scan line score = 0.8 + 0.7 + 0.9 = 2.4
+
+The aggregated values of\textbf{ d3 and d2 $<$ scan line score} - continue algorithm
+\\
+\textbf{Sequential access for L3: d4 0.8}
+
+\textbf{Random access for L1 d4:0 and L2 d4:0.3}
+
+Aggregation of d4 $d4 = 0 + 0.8 + 0.3 = 1.1$
+ \begin{center}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+            \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline 
+        $d_4 \, \, 0.8$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+
+Scan line score = 0.8 + 0.7 + 0.8 = 2.3
+
+The aggregated values of\textbf{ d3 and d2 $<$ scan line score} - continue algorithm 
+\\
+\textbf{Sequential access for L1: d1 0.5}
+ \begin{center}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.5$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+            \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline 
+        $d_4 \, \, 0.8$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+    
+Scan line score = 0.5 + 0.7 + 0.8 = 2
+
+The aggregated values of\textbf{ d3 and d2 $<$ scan line score} - continue algorithm 
+
+\textbf{Sequential access for L2: d1 0.5}
+ \begin{center}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.5$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+          $d_3 \, \, 0.5$\\\hline
+            \end{tabular}
+    \end{minipage}
+    \hspace{5mm}
+    \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+        $L_3$\\\hline
+        $d_3 \, \, 0.9$\\\hline 
+        $d_4 \, \, 0.8$\\\hline
+        \end{tabular}
+    \end{minipage}
+    \end{center}
+    
+Scan line score = 0.5 + 0.5 + 0.8 = 1.8
+
+The aggregated values of\textbf{ d3 and d2 $>$ scan line score} - \textbf{Terminate algorithm }  
+
+\textbf{Sequential Accesses: 8
+Random Accesses : 8}
+\end{document}
+
