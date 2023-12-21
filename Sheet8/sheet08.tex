@@ -1,0 +1,171 @@
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 8}}
+\newcommand{\outdate}{11.12.2023}
+\newcommand{\duedate}{01.01.2024 12:00 MEZ}
+\newcommand{\video}{040}
+
+\lstset{
+    escapeinside={(*}{*)}
+}
+
+\begin{document}
+
+\input{../includes/header.tex}
+
+\begin{center}
+\textsf{We wish you happy holidays and a wonderful new year.}
+\end{center}
+
+\question[1]{Processing k-NN Queries in  M-Trees}
+
+K Nearest Neighbors (k-NN) query $Q=(q, k)$ returns the $k$ closest points (points that have the shortest distance) to the query point $q$.
+
+\begin{enumerate}
+\item Provide a pseudo code for k-NN queries in an M-Tree.
+
+\item Did you apply or can you think of pruning techniques that could be applied to reduce the number of points examined as candidates for the result? Describe why the conditions hold. 
+
+\end{enumerate}
+
+\question[1]{Extendible Hashing}  
+
+Implement extendible hashing in a language of your choice. A basic Java template is available in OLAT.
+
+Your program should take a bucket capacity $k$ and a data file as input.
+Each line of the file should then be hashed and distributed, using extendible hashing, into buckets with a capacity of $k$.
+
+Build the directory using the prefixes of the hash values.
+I.e.: Use the \emph{first} $d$ digits of the hash values.
+The buckets are empty in the beginning, thereby, the directory has size $d=0$.
+
+Your implementation must have the following features:
+\begin{itemize}
+\item Take data file as parameter
+\begin{itemize}
+  \item Calculate the hash of each line
+\end{itemize}
+\item Take maximum bucket size as parameter
+\item After each insertion step, return the current directory (The buckets, their content, the local depth, the hash prefixes pointing to them, and the global depth)
+\end{itemize}
+
+The template already implements reading the file and hashing each line.
+Submit the source code and the output of your program, when executed with the data file in OLAT and $k=3$.
+
+\newpage
+\question[1]{Linear Hashing}
+
+Perform linear hashing for the following given parameters:
+
+Using the following sequence of hash functions:
+\[
+H_i(K) = K \mod (2 \cdot 2^i) \textnormal{ with } i \in \{0, 1, 2, \dots, n\}
+\]
+
+The hash table should be initialized with 2 buckets.
+Each bucket has a capacity of 3 entries.
+If more than $\beta > \frac{2}{3}$ of the table is occupied, controlled splitting should be performed.
+
+Insert the following values in the given order:
+
+\[
+27, 13, 28, 3, 21, 8, 27, 16, 36
+\]
+
+Write down what happens during each insert.
+Also visualize your buckets after every split.
+
+\question[1]{Top-k Algorithms}
+
+Apply the FA and TA algorithm for $k=2$, using addition as aggregation function, on the following three index lists.
+ Write down all index list accesses, as well as the current top-$k$ documents after each step.
+ How many sequential and how many random accesses were executed?
+
+  \begin{table}[h]
+    \begin{center}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_1$\\\hline
+          $d_2 \, \, 0.9$\\\hline
+          $d_3 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.5$\\\hline
+          $d_6 \, \, 0.4$\\\hline
+          $d_5 \, \, 0.3$\\\hline
+          $d_8 \, \, 0.2$\\\hline
+          $d_7 \, \, 0.1$\\\hline
+        \end{tabular}
+      \end{minipage}
+      \hspace{5mm}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_2$\\\hline
+          $d_1 \, \, 0.8$\\\hline
+          $d_2 \, \, 0.7$\\\hline
+          $d_3 \, \, 0.5$\\\hline
+          $d_6 \, \, 0.4$\\\hline
+          $d_8 \, \, 0.3$\\\hline
+          $d_4 \, \, 0.3$\\\hline
+          $d_7 \, \, 0.1$\\\hline
+        \end{tabular}
+      \end{minipage}
+      \hspace{5mm}
+      \begin{minipage}[t]{2cm}
+        \begin{tabular}{|p{25pt}|}\hline
+          $L_3$\\\hline
+          $d_3 \, \, 0.9$\\\hline
+          $d_4 \, \, 0.8$\\\hline
+          $d_1 \, \, 0.6$\\\hline
+          $d_2 \, \, 0.4$\\\hline
+          $d_5 \, \, 0.3$\\\hline
+          $d_7 \, \, 0.2$\\\hline
+          $d_8 \, \, 0.2$\\\hline
+        \end{tabular}
+      \end{minipage}
+    \end{center}
+  \end{table}
+
+\newpage
+\question[0]{Potpourri}
+\textit{This is an optional exercise for learning purposes only, don't submit anything. There will be no points given for answering these questions.}
+
+Below a list of review question that you can also expect to be given in the written or oral exams.
+You can use these questions to deepen your knowledge of the previous topics.
+
+\begin{enumerate}[label=\arabic*.]
+
+  \item Give an example page reference string of length at least 4 where FIFO has less misses than LRU, if possible.
+
+  \item Explain, in your own words, the five minute rule.
+
+  \item Given a secondary index on an attribute that has one distinct value for each tuple. Is this index a dense or a sparse index?
+
+  \item In which cases do database systems sort data? Name at least 2.
+  \item Why does a B+ tree have a higher fan out than a B tree and what are the consequences?
+
+  \item Explain one advantage and one disadvantage of a heap-organized file compared to a sequentially ordered file.
+  \item What kind of queries usually benefit most from having a clustered index?
+  \item Does the order of the attributes of a composite index influence the efficiency of a query over these attributes?
+  \item Describe how to remove duplicates by hashing.
+  \item Explain why it sometimes can be better to sort the entire relation instead of accessing a large chunk of sorted data using a non-clustered index.
+  \item When could it make sense to prefer a schema in 3NF to a schema in BCNF?
+
+  \item Is it possible that a nested loop join is more efficient than a sort merge join?
+
+  \item How many left-deep trees are possible for star queries with $n$ relations if no cross products are allowed?
+
+  \item Is a hash join always better than a nested loop join?
+
+  \item Explain the difference between biased and unbiased estimator.
+
+  \item Describe the histogram estimated using the following function: $f(x) = n$.
+  \item Given a random variable $X$ with distribution function $F$. What is the $p$ quantile of $X$?
+
+  \item Which initial values are described by the wavelet transform $[4,2,1,0]$?
+  \item It is usually assumed that the individual predicates of a conjunctive predicate are independent, when computing the overall selectivity. Given a real-world example where this is far off and explain what the consequences can be for the query optimizer.
+
+  \item Explain which changes have to be performed on an materialized view, calculating an aggregation, with functions COUNT, SUM, and AVG when adding or removing tuples from the base relation.
+
+\end{enumerate}
+
+\end{document}
