@@ -152,9 +152,14 @@ class Directory {
     System.out.println("Initialized Directory with maximum bucket size: " + maxBucketSize);
     this.maxBucketSize = maxBucketSize;
     this.bucketVector = new Vector<>();
+    byte zeroByte = 0;
+    this.bucketVector.add(new DataBucket(zeroByte,0));
   }
 
-  public static String kBitsToString(byte value, int depth) {
+  public static int kSignificantBitsToInteger(byte value, int depth) {
+    if(depth == 0)
+      return 0;
+
     StringBuilder result = new StringBuilder();
     for (int i = 7; i >= 8-depth; i--) {
       if((value & (1 << i)) != 0)
@@ -164,7 +169,8 @@ class Directory {
       }
       result.append("0");
     }
-    return result.toString();
+    var resultString = result.toString();
+    return Integer.parseInt(result.toString(),2);
   }
 
   private byte getHash(String data)
@@ -181,24 +187,53 @@ class Directory {
     {
       bucketVector.add(i*2+1, bucketVector.get(i*2));
     }
+    d++;
   }
 
   private void splitBucket(int bucketIndex)
   {
     var bucket = bucketVector.get(bucketIndex);
-    var bucketCount = Math.pow(2,d-bucket.c);
-    byte res =  Math.pow(2,8-bucket.c);
-    var newBucket = new DataBucket()
+    var bucketCount = (int)((Math.pow(2,d-bucket.c))/2);
+    var newKey =  (byte)(bucket.key + (int)Math.pow(2,8-(bucket.c+1)));
+    var newBucket = new DataBucket(newKey,bucket.c+1);
     for (var entry:
          bucket.Data) {
 
       var hash = getHash(entry);
       var relevantBits = ExtendibleHashing.getXSignificantBits(hash,bucket.c+1);
 
-
+      if(ExtendibleHashing.getBoolIndex(8 - (bucket.c + 1), relevantBits))
+      {
+        newBucket.Data.add(entry);
+        bucket.Data.remove(entry);
+      }
     }
 
+    for (int i = 0; i < bucketCount; i ++)
+    {
+      int newBucketIndex = i+bucketIndex+bucketCount;
+      bucketVector.remove(newBucketIndex);
+      bucketVector.add(newBucketIndex,newBucket);
+    }
+    bucket.c++;
+  }
 
+  private byte moveBitsToEnd(byte originalByte, int numBitsToMove) {
+    // Ensure numBitsToMove is within the range [0, 8]
+    numBitsToMove = Math.min(Math.max(numBitsToMove, 0), 8);
+    if(numBitsToMove == 0)
+      return 0;
+
+    byte frontBits = (byte) (originalByte >> (8 - numBitsToMove));
+
+    // Shift the remaining bits to the left and set the moved bits to zero
+    originalByte <<= numBitsToMove;
+    originalByte &= (1 << numBitsToMove) - 1;
+
+    // Combine the shifted bits with the extracted bits
+    byte resultByte = (byte) (originalByte | frontBits);
+
+    return resultByte;
   }
   /**
    * This function will be called with the hashed integer value. You may assume
@@ -212,7 +247,10 @@ class Directory {
     System.out.println("Inserting '" + data + "' with hash value " + ExtendibleHashing.getBooleanString(hash));
 
     var dSignificantBits = ExtendibleHashing.getXSignificantBits(hash, d);
-    var bucketIndex = ExtendibleHashing.reverseByteOrder(dSignificantBits);
+    //var bucketIndex = moveBitsToEnd(hash,d);
+    var bucketIndex = kSignificantBitsToInteger(hash,d);
+    //var bucketIndex = dSignificantBits >> (8-d);
+    //byte test = (byte)((dSignificantBits >>> (8-d)) & 0b00000001);
     var bucket =bucketVector.get(bucketIndex);
 
 
@@ -220,10 +258,13 @@ class Directory {
     {
       if(bucket.c == d)
       {
-        //increase the directory
+        doubleDirectory();
+        addEntry(hash,data);
+        return;
       }
-      //split the bucket
-      //addEntry(hash,data)
+      splitBucket(bucketVector.indexOf(bucket));
+      addEntry(hash,data);
+      return;
     }
 
     bucket.Data.add(data);
