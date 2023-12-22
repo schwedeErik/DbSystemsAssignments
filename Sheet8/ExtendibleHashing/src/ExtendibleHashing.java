@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 public class ExtendibleHashing {
 
@@ -144,13 +145,13 @@ class Directory {
   private int maxBucketSize; // Maximum Bucket size
   private int d = 0; // Global Depth
 
-  private HashMap<String,DirectoryPointer> directoryBuckets;
+  private Vector<DataBucket> bucketVector;
 
 
   Directory(int maxBucketSize) {
     System.out.println("Initialized Directory with maximum bucket size: " + maxBucketSize);
     this.maxBucketSize = maxBucketSize;
-    this.directoryBuckets = new HashMap<>();
+    this.bucketVector = new Vector<>();
   }
 
   public static String kBitsToString(byte value, int depth) {
@@ -166,6 +167,39 @@ class Directory {
     return result.toString();
   }
 
+  private byte getHash(String data)
+  {
+    return Integer.valueOf(data.hashCode() % 255).byteValue();
+  }
+
+  private void doubleDirectory()
+  {
+    //before: a b c d
+    //after:  a a b b c c d d
+    var bucketVectorSize = bucketVector.size();
+    for (int i = 0; i < bucketVectorSize; i++ )
+    {
+      bucketVector.add(i*2+1, bucketVector.get(i*2));
+    }
+  }
+
+  private void splitBucket(int bucketIndex)
+  {
+    var bucket = bucketVector.get(bucketIndex);
+    var bucketCount = Math.pow(2,d-bucket.c);
+    byte res =  Math.pow(2,8-bucket.c);
+    var newBucket = new DataBucket()
+    for (var entry:
+         bucket.Data) {
+
+      var hash = getHash(entry);
+      var relevantBits = ExtendibleHashing.getXSignificantBits(hash,bucket.c+1);
+
+
+    }
+
+
+  }
   /**
    * This function will be called with the hashed integer value. You may assume
    * that only binary hash values <= 8 bits are inserted.
@@ -177,9 +211,32 @@ class Directory {
   void addEntry(byte hash, String data) {
     System.out.println("Inserting '" + data + "' with hash value " + ExtendibleHashing.getBooleanString(hash));
 
+    var dSignificantBits = ExtendibleHashing.getXSignificantBits(hash, d);
+    var bucketIndex = ExtendibleHashing.reverseByteOrder(dSignificantBits);
+    var bucket =bucketVector.get(bucketIndex);
+
+
+    if(bucket.Data.size() == maxBucketSize)
+    {
+      if(bucket.c == d)
+      {
+        //increase the directory
+      }
+      //split the bucket
+      //addEntry(hash,data)
+    }
+
+    bucket.Data.add(data);
+
+
+
+
+
+
+
     //check global depth
     //take the first d bits from the hash
-    var directoryKey = kBitsToString(hash,d);
+    /*var directoryKey = kBitsToString(hash,d);
     //check the entry in the directory for that d bit sequence
     //go to the bucket it points too
 
@@ -191,11 +248,6 @@ class Directory {
     }
     dirBucket.dataBucket.Data.add(data);
 
-
-
-
-
-
     //check if the buckte exedet the maxBucketSize
     // no -> add the item to the bucket
     // yes -> split the bucket by increasing the depth of the bucket
@@ -203,26 +255,12 @@ class Directory {
     // yes -> increase the global depth
     // no -> everything is fine
 
-
-
-
-
-
-
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////////
-    // TODO: Your code here!
-    /////////////////////////////////////////////////////////////////////
     System.err.println("ERROR: Directory.addEntry not implemented!");
 
 
     System.out.println("======================================");
     System.out.println(toString());
-    System.out.println("======================================");
+    System.out.println("======================================");*/
   }
 
   /**
@@ -244,21 +282,17 @@ class Directory {
 
 class DataBucket
 {
-  public int maxItems;
-  public String key;
+  public int c;
+  public byte key;
   public List<String> Data;
 
-  DataBucket(String key, int maxItems)
+  DataBucket(byte key, int c)
   {
     this.key  = key;
-    this.maxItems = maxItems;
     this.Data = new ArrayList<>();
+    this.c = c;
   }
 
-  public int GetC()
-  {
-    return key.length();
-  }
 }
 
 class DirectoryPointer
