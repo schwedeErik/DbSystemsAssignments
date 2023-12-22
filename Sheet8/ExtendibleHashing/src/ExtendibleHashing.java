@@ -4,10 +4,7 @@ import java.lang.reflect.Array;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 public class ExtendibleHashing {
 
@@ -38,7 +35,7 @@ public class ExtendibleHashing {
     }
     Directory d = new Directory(maxBucketSize);
     hashFileToDirectory(args[1], d);
-
+    System.out.println(d.toString());
   }
 
   /**
@@ -159,7 +156,9 @@ class Directory {
   public static int kSignificantBitsToInteger(byte value, int depth) {
     if(depth == 0)
       return 0;
-
+    return Integer.parseInt(kSignificantBitsToString(value, depth),2);
+  }
+  public static String kSignificantBitsToString(byte value, int depth) {
     StringBuilder result = new StringBuilder();
     for (int i = 7; i >= 8-depth; i--) {
       if((value & (1 << i)) != 0)
@@ -169,8 +168,7 @@ class Directory {
       }
       result.append("0");
     }
-    var resultString = result.toString();
-    return Integer.parseInt(result.toString(),2);
+    return result.toString();
   }
 
   private byte getHash(String data)
@@ -196,8 +194,9 @@ class Directory {
     var bucketCount = (int)((Math.pow(2,d-bucket.c))/2);
     var newKey =  (byte)(bucket.key + (int)Math.pow(2,8-(bucket.c+1)));
     var newBucket = new DataBucket(newKey,bucket.c+1);
+    var tt = bucket.Data.stream().toList();
     for (var entry:
-         bucket.Data) {
+         tt) {
 
       var hash = getHash(entry);
       var relevantBits = ExtendibleHashing.getXSignificantBits(hash,bucket.c+1);
@@ -312,12 +311,26 @@ class Directory {
    */
   public String toString() {
 
-    /////////////////////////////////////////////////////////////////////
-    // TODO: Your code here!
-    /////////////////////////////////////////////////////////////////////
-    System.err.println("ERROR: Directory.toString not implemented!");
 
-    return "";
+
+    var outputString =
+            "Global depth d:" + d + "\n" +
+            "Data buckets:\n";
+
+    var buckets = new HashSet<>(bucketVector);
+
+    for (var bucket:
+         buckets) {
+      outputString = outputString + "  Bucket: C= " + bucket.c + ", Prefix = " + kSignificantBitsToString(bucket.key,bucket.c)  + "\n"
+      + "    Data entries:\n      ";
+      for(var data:
+          bucket.Data)
+      {
+        outputString = outputString + "\'" +data + "\'" + "\n      ";
+      }
+      outputString = outputString + "\n";
+    }
+    return outputString;
   }
 }
 
