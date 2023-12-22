@@ -237,7 +237,7 @@ class Directory {
         addEntry(hash,data);
         return;
       }
-      System.out.println("Spliting bucket with prefix: " + kSignificantBitsToString(bucket.key,bucket.c));
+      System.out.println("Spliting bucket with prefix: " + "\'" + kSignificantBitsToString(bucket.key,bucket.c) + "\'");
       splitBucket(bucketVector.indexOf(bucket));
       addEntry(hash,data);
       return;
@@ -265,7 +265,7 @@ class Directory {
 
     for (var bucket:
          buckets) {
-      outputString = outputString + "  Bucket: C= " + bucket.c + ", Prefix = " + kSignificantBitsToString(bucket.key,bucket.c)  + "\n"
+      outputString = outputString + "  Bucket: C = " + bucket.c + ", Prefix = " + "\'" + kSignificantBitsToString(bucket.key,bucket.c) + "\'"  + "\n"
       + "    Data entries:\n      ";
       for(var data:
           bucket.Data)
