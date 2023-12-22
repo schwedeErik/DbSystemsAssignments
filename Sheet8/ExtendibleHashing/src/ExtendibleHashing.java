@@ -35,7 +35,6 @@ public class ExtendibleHashing {
     }
     Directory d = new Directory(maxBucketSize);
     hashFileToDirectory(args[1], d);
-    System.out.println(d.toString());
   }
 
   /**
@@ -194,12 +193,11 @@ class Directory {
     var bucketCount = (int)((Math.pow(2,d-bucket.c))/2);
     var newKey =  (byte)(bucket.key + (int)Math.pow(2,8-(bucket.c+1)));
     var newBucket = new DataBucket(newKey,bucket.c+1);
-    var tt = bucket.Data.stream().toList();
-    for (var entry:
-         tt) {
+    var dataCopy = bucket.Data.stream().toList();
 
-      var hash = getHash(entry);
-      var relevantBits = ExtendibleHashing.getXSignificantBits(hash,bucket.c+1);
+    for (var entry:
+         dataCopy) {
+      var relevantBits = ExtendibleHashing.getXSignificantBits(getHash(entry),bucket.c+1);
 
       if(ExtendibleHashing.getBoolIndex(8 - (bucket.c + 1), relevantBits))
       {
@@ -214,26 +212,10 @@ class Directory {
       bucketVector.remove(newBucketIndex);
       bucketVector.add(newBucketIndex,newBucket);
     }
+
     bucket.c++;
   }
 
-  private byte moveBitsToEnd(byte originalByte, int numBitsToMove) {
-    // Ensure numBitsToMove is within the range [0, 8]
-    numBitsToMove = Math.min(Math.max(numBitsToMove, 0), 8);
-    if(numBitsToMove == 0)
-      return 0;
-
-    byte frontBits = (byte) (originalByte >> (8 - numBitsToMove));
-
-    // Shift the remaining bits to the left and set the moved bits to zero
-    originalByte <<= numBitsToMove;
-    originalByte &= (1 << numBitsToMove) - 1;
-
-    // Combine the shifted bits with the extracted bits
-    byte resultByte = (byte) (originalByte | frontBits);
-
-    return resultByte;
-  }
   /**
    * This function will be called with the hashed integer value. You may assume
    * that only binary hash values <= 8 bits are inserted.
@@ -243,64 +225,29 @@ class Directory {
    *
    */
   void addEntry(byte hash, String data) {
-    System.out.println("Inserting '" + data + "' with hash value " + ExtendibleHashing.getBooleanString(hash));
-
-    var dSignificantBits = ExtendibleHashing.getXSignificantBits(hash, d);
-    //var bucketIndex = moveBitsToEnd(hash,d);
     var bucketIndex = kSignificantBitsToInteger(hash,d);
-    //var bucketIndex = dSignificantBits >> (8-d);
-    //byte test = (byte)((dSignificantBits >>> (8-d)) & 0b00000001);
     var bucket =bucketVector.get(bucketIndex);
-
 
     if(bucket.Data.size() == maxBucketSize)
     {
       if(bucket.c == d)
       {
+        System.out.println("Increasing global depth!");
         doubleDirectory();
         addEntry(hash,data);
         return;
       }
+      System.out.println("Spliting bucket with prefix: " + kSignificantBitsToString(bucket.key,bucket.c));
       splitBucket(bucketVector.indexOf(bucket));
       addEntry(hash,data);
       return;
     }
-
+    System.out.println("Inserting '" + data + "' with hash value " + ExtendibleHashing.getBooleanString(hash));
     bucket.Data.add(data);
-
-
-
-
-
-
-
-    //check global depth
-    //take the first d bits from the hash
-    /*var directoryKey = kBitsToString(hash,d);
-    //check the entry in the directory for that d bit sequence
-    //go to the bucket it points too
-
-    var dirBucket = directoryBuckets.get(directoryKey);
-    if(dirBucket == null)
-    {
-      dirBucket = new DirectoryPointer(directoryKey,new DataBucket(directoryKey,maxBucketSize));
-      directoryBuckets.put(directoryKey, dirBucket);
-    }
-    dirBucket.dataBucket.Data.add(data);
-
-    //check if the buckte exedet the maxBucketSize
-    // no -> add the item to the bucket
-    // yes -> split the bucket by increasing the depth of the bucket
-    // check if the new depth exieds the global depth
-    // yes -> increase the global depth
-    // no -> everything is fine
-
-    System.err.println("ERROR: Directory.addEntry not implemented!");
-
 
     System.out.println("======================================");
     System.out.println(toString());
-    System.out.println("======================================");*/
+    System.out.println("======================================");
   }
 
   /**
@@ -310,9 +257,6 @@ class Directory {
    * @return A String representing the above content.
    */
   public String toString() {
-
-
-
     var outputString =
             "Global depth d:" + d + "\n" +
             "Data buckets:\n";
@@ -326,7 +270,7 @@ class Directory {
       for(var data:
           bucket.Data)
       {
-        outputString = outputString + "\'" +data + "\'" + "\n      ";
+        outputString = outputString + "\'" +data + "\'  " + kSignificantBitsToString(getHash(data),8) + "\n      ";
       }
       outputString = outputString + "\n";
     }
@@ -345,24 +289,6 @@ class DataBucket
     this.key  = key;
     this.Data = new ArrayList<>();
     this.c = c;
-  }
-
-}
-
-class DirectoryPointer
-{
-  public String key;
-  public DataBucket dataBucket;
-
-  public int GetD()
-  {
-    return key.length();
-  }
-
-  DirectoryPointer(String key, DataBucket dataBucket)
-  {
-    this.key = key;
-    this.dataBucket = dataBucket;
   }
 
 }
