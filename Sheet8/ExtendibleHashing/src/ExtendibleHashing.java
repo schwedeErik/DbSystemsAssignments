@@ -148,8 +148,7 @@ class Directory {
     System.out.println("Initialized Directory with maximum bucket size: " + maxBucketSize);
     this.maxBucketSize = maxBucketSize;
     this.bucketVector = new Vector<>();
-    byte zeroByte = 0;
-    this.bucketVector.add(new DataBucket(zeroByte,0));
+    this.bucketVector.add(new DataBucket((byte)0,0));
   }
 
   public static int kSignificantBitsToInteger(byte value, int depth) {
@@ -212,7 +211,6 @@ class Directory {
       bucketVector.remove(newBucketIndex);
       bucketVector.add(newBucketIndex,newBucket);
     }
-
     bucket.c++;
   }
 
