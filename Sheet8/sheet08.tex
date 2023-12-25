@@ -25,8 +25,61 @@ K Nearest Neighbors (k-NN) query $Q=(q, k)$ returns the $k$ closest points (poin
 \begin{enumerate}
 \item Provide a pseudo code for k-NN queries in an M-Tree.
 
-\item Did you apply or can you think of pruning techniques that could be applied to reduce the number of points examined as candidates for the result? Describe why the conditions hold. 
+\item Did you apply or can you think of pruning techniques that could be applied to reduce the number of points examined as candidates for the result? Describe why the conditions hold.
+\\\\{\bf Solutions:} 
+\\\\
+The following pseudo code is derived from the paper \dq M-tree: An Efficient Access Method for Similarity Search in Metric Spaces\dq . \href[]{https://www.vldb.org/conf/1997/P426.PDF}{https://www.vldb.org/conf/1997/P426.PDF}\\\\
+Similar to the R-Tree also the lower bound and upper bound of the minimal distance are important for the k-NN-query. The algorithm uses a queue of nodes that should the tested. This queue is called PR. The k-NN Objects are stored in an array called NN together with there distance to the query object.
+\begin{lstlisting}[escapeinside={(*}{*)}]
+PR.add([Root node,NULL])
+for(i=0;i<k;i++)
+  NN[i] = [NULL,(*$\infty$*)]
+while(PR is not empty)
+  NextNode = the node with the smallest min distance in the PR 
+  knnNodeSearch(NextNode,Q,K)
+\end{lstlisting}
 
+Here the code for the knnNodeSearch(NextNode, Q, K) function:\\
+Some clarifications:\\
+$O_p =$ parent Object of $N$.\\
+$d_k =$ distance of the object in the result array with the biggest distance to the query object Q\\
+$Q_r =$ Object of $N$.\\
+$O_j =$ Object of the leave node.\\
+$d_{min}(T(O_r)) =$ The lower bound of the shortest distance between query object Q and $Q_r$\\
+$d_{min}(T(O_r)) = max\{d(Q_r,Q)-r(O_r),0\}$\\
+$d_{max}(T(O_r)) =$ The upper bound of the shortest distance between query object Q and $Q_r$\\
+$d_{max}(T(O_r)) = d(Q_r,Q)+r(O_r)$\\
+$r(O_r) =$ the radius of object $O_r$
+\begin{lstlisting}[escapeinside={(*}{*)}]
+if N is not a leave
+  if((*$|d(O_p,Q)-d(O_p,Q_r)|\le d_k+r(O_r)$*))
+  calculate (*$d(Q_r,Q)$*)
+  if((*$d_{min}(T(O_r))\le d_k$*))
+    PR.add([(*$T(O_r)$*), (*$d_{min}(T(O_r))$*)])
+    if((*$d_{max}(T(O_r)) < d_k$*))
+      Update the NN array with [NULL,(*$d_{max}(T(O_r))$*)]
+      Remove all entries from PR that have a higher lower bound 
+      for the minimal distance than 
+      (*$d_k$*). (*$d_{min}(T(O_r)) > d_k$*)
+
+if N is a leave
+  if((*$|d(O_p,Q)-d(O_j,Q_p)|\le d_k$*))
+    calculate d(O_j,Q)
+    if((*$d(O_j,Q)\le d_k$*))
+      Add (*$O_j$*) to the NN Array.
+      Remove all elements from PR that have a smaller 
+      lower bound minimal distance than the element with
+      the biggest distance in the result array NN.
+\end{lstlisting}
+
+The solution mentioned above tries to minimize the amount of examined nodes in the tree. In order to achieve this it 
+uses the upper and lower bound of the minimal distance between the object of the node and the query object.
+It uses the fact that if the lower bound of the minimal distance to an node object is bigger then the upper bound 
+of the minimal distance to another node object. The node with the higher lower bound does not have to be examined.
+The same strategy is also used in the R-Tree the only difference is the way how to calculate the lower and upper bound of the minimum distance.\\
+Example:\\
+$d_{max}(T(O_1)) < d_{min}(T(O_2))$\\
+$\rightarrow$ The nodes under $T(O_2)$ does not have to be examined anymore. 
 \end{enumerate}
 
 \question[1]{Extendible Hashing}  
