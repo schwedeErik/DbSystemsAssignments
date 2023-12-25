@@ -143,12 +143,11 @@ class Directory {
 
   private Vector<DataBucket> bucketVector;
 
-
   Directory(int maxBucketSize) {
     System.out.println("Initialized Directory with maximum bucket size: " + maxBucketSize);
     this.maxBucketSize = maxBucketSize;
     this.bucketVector = new Vector<>();
-    this.bucketVector.add(new DataBucket((byte)0,0));
+    this.bucketVector.add(new DataBucket(0));
   }
 
   public static int kSignificantBitsToInteger(byte value, int depth) {
@@ -169,7 +168,7 @@ class Directory {
     return result.toString();
   }
 
-  private byte getHash(String data)
+  public static byte getHash(String data)
   {
     return Integer.valueOf(data.hashCode() % 255).byteValue();
   }
@@ -190,8 +189,7 @@ class Directory {
   {
     var bucket = bucketVector.get(bucketIndex);
     var bucketCount = (int)((Math.pow(2,d-bucket.c))/2);
-    var newKey =  (byte)(bucket.key + (int)Math.pow(2,8-(bucket.c+1)));
-    var newBucket = new DataBucket(newKey,bucket.c+1);
+    var newBucket = new DataBucket(bucket.c+1);
     var dataCopy = bucket.Data.stream().toList();
 
     for (var entry:
@@ -235,7 +233,7 @@ class Directory {
         addEntry(hash,data);
         return;
       }
-      System.out.println("Spliting bucket with prefix: " + "\'" + kSignificantBitsToString(bucket.key,bucket.c) + "\'");
+      System.out.println("Spliting bucket with prefix: " + "\'" + bucket.getPrefix() + "\'");
       splitBucket(bucketVector.indexOf(bucket));
       addEntry(hash,data);
       return;
@@ -263,7 +261,7 @@ class Directory {
 
     for (var bucket:
          buckets) {
-      outputString = outputString + "  Bucket: C = " + bucket.c + ", Prefix = " + "\'" + kSignificantBitsToString(bucket.key,bucket.c) + "\'"  + "\n"
+      outputString = outputString + "  Bucket: C = " + bucket.c + ", Prefix = " + "\'" + bucket.getPrefix() + "\'"  + "\n"
       + "    Data entries:\n      ";
       for(var data:
           bucket.Data)
@@ -279,14 +277,16 @@ class Directory {
 class DataBucket
 {
   public int c;
-  public byte key;
   public List<String> Data;
 
-  DataBucket(byte key, int c)
+  DataBucket(int c)
   {
-    this.key  = key;
     this.Data = new ArrayList<>();
     this.c = c;
   }
 
+  public String getPrefix()
+  {
+    return Directory.kSignificantBitsToString(Directory.getHash(Data.getFirst()),c);
+  }
 }
