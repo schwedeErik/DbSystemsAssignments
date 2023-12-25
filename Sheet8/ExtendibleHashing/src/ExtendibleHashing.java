@@ -261,14 +261,7 @@ class Directory {
 
     for (var bucket:
          buckets) {
-      outputString = outputString + "  Bucket: C = " + bucket.c + ", Prefix = " + "\'" + bucket.getPrefix() + "\'"  + "\n"
-      + "    Data entries:\n      ";
-      for(var data:
-          bucket.Data)
-      {
-        outputString = outputString + "\'" +data + "\'  " + kSignificantBitsToString(getHash(data),8) + "\n      ";
-      }
-      outputString = outputString + "\n";
+      outputString = outputString + bucket.toString();
     }
     return outputString;
   }
@@ -288,5 +281,19 @@ class DataBucket
   public String getPrefix()
   {
     return Directory.kSignificantBitsToString(Directory.getHash(Data.getFirst()),c);
+  }
+
+  public String toString()
+  {
+    String outputString = "";
+    outputString = outputString + "  Bucket: C = " + c + ", Prefix = " + "\'" + getPrefix() + "\'"  + "\n"
+            + "    Data entries:\n      ";
+    for(var data:
+            Data)
+    {
+      outputString = outputString + "\'" +data + "\'  " + Directory.kSignificantBitsToString(Directory.getHash(data),8) + "\n      ";
+    }
+    outputString = outputString + "\n";
+    return outputString;
   }
 }
