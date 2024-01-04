@@ -32,9 +32,9 @@ The following pseudo code is derived from the paper \dq M-tree: An Efficient Acc
 Similar to the R-Tree, also the lower bound and upper bound of the minimum distance between a node and the query object are important for the k-NN-query. The algorithm uses a queue of nodes that should the tested. This queue is called PR. The k-NN Objects are stored in an array called NN together with there distance to the query object.
 \begin{lstlisting}[escapeinside={(*}{*)}]
 PR.add([Root node,NULL])
-for(i=0;i<k;i++)
+for(i=0;i<k;i++):
   NN[i] = [NULL,(*$\infty$*)]
-while(PR is not empty)
+while(PR is not empty):
   NextNode = the node with the smallest lower bound minimum 
   distance(*($d_{min}(T(Q_r))$)*) in the PR 
   knnNodeSearch(NextNode,Q,K)
