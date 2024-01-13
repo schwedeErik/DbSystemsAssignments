@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ExtendibleHashing {
 
@@ -144,13 +147,13 @@ class Directory {
   private int maxBucketSize; // Maximum Bucket size
   private int d = 0; // Global Depth
 
-  private HashMap<String,DirectoryPointer> directoryBuckets;
+  private List<DirectoryEntry> directoryBuckets;
 
 
   Directory(int maxBucketSize) {
     System.out.println("Initialized Directory with maximum bucket size: " + maxBucketSize);
     this.maxBucketSize = maxBucketSize;
-    this.directoryBuckets = new HashMap<>();
+    this.directoryBuckets = new ArrayList<DirectoryEntry>();
   }
 
   public static String kBitsToString(byte value, int depth) {
@@ -183,17 +186,6 @@ class Directory {
     //check the entry in the directory for that d bit sequence
     //go to the bucket it points too
 
-    var dirBucket = directoryBuckets.get(directoryKey);
-    if(dirBucket == null)
-    {
-      dirBucket = new DirectoryPointer(directoryKey,new DataBucket(directoryKey,maxBucketSize));
-      directoryBuckets.put(directoryKey, dirBucket);
-    }
-    dirBucket.dataBucket.Data.add(data);
-
-
-
-
 
 
     //check if the buckte exedet the maxBucketSize
@@ -203,26 +195,6 @@ class Directory {
     // yes -> increase the global depth
     // no -> everything is fine
 
-
-
-
-
-
-
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////////
-    // TODO: Your code here!
-    /////////////////////////////////////////////////////////////////////
-    System.err.println("ERROR: Directory.addEntry not implemented!");
-
-
-    System.out.println("======================================");
-    System.out.println(toString());
-    System.out.println("======================================");
   }
 
   /**
@@ -240,13 +212,47 @@ class Directory {
 
     return "";
   }
+
+  private Tuple<DataBucket,DataBucket> SplitDataBucket(DataBucket oldDatabucket)
+  {
+    var oldC = oldDatabucket.GetC();
+    var newC = oldC+1;
+    var data = oldDatabucket.Data;
+    var keyZero = oldDatabucket.key + "0";
+    var keyOne = oldDatabucket.key + "1";
+    var zeroBucketData = oldDatabucket.Data.stream().filter(dE -> Objects.equals(kBitsToString(dE.hashValue,newC), keyZero)).toList();
+    var oneBucketData = oldDatabucket.Data.stream().filter(dE -> Objects.equals(kBitsToString(dE.hashValue,newC), keyOne)).toList();
+    var zeroBucket = new DataBucket(keyZero,maxBucketSize);
+    zeroBucket.Data = zeroBucketData;
+    var oneBucket = new DataBucket(keyOne,maxBucketSize);
+    oneBucket.Data = oneBucketData;
+    return  new Tuple<>(zeroBucket,oneBucket);
+  }
+
+  private List<DirectoryEntry> ExtendDirectory(List<DirectoryEntry> direc)
+  {
+
+    var direcOne = direc.stream().toList();
+    direc.forEach(e -> e.key = e.key + "0" );
+    direcOne.forEach(e -> e.key = e.key + "1");
+    return Stream.concat(direc.stream(), direcOne.stream()).collect(Collectors.toList());
+  }
+
+  private void IncreaseDepth()
+  {
+    ExtendDirectory(directoryBuckets);
+  }
 }
+
+
+
+
 
 class DataBucket
 {
   public int maxItems;
   public String key;
-  public List<String> Data;
+  public List<DataEntry> Data;
 
   DataBucket(String key, int maxItems)
   {
@@ -261,7 +267,7 @@ class DataBucket
   }
 }
 
-class DirectoryPointer
+class DirectoryEntry
 {
   public String key;
   public DataBucket dataBucket;
@@ -271,10 +277,30 @@ class DirectoryPointer
     return key.length();
   }
 
-  DirectoryPointer(String key, DataBucket dataBucket)
+  DirectoryEntry(String key, DataBucket dataBucket)
   {
     this.key = key;
     this.dataBucket = dataBucket;
   }
+}
 
+class DataEntry
+{
+  public byte hashValue;
+  public String value;
+  DataEntry() {}
+  DataEntry(byte hashValue, String value)
+  {
+    this.hashValue = hashValue;
+    this.value = value;
+  }
+}
+
+class Tuple<X, Y> {
+  public final X x;
+  public final Y y;
+  public Tuple(X x, Y y) {
+    this.x = x;
+    this.y = y;
+  }
 }
