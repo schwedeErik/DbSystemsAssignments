@@ -114,8 +114,7 @@ public class Skyline {
     private static Set<Point> calculateSkyline(FakeRTree tree){
 
         // find nn to origen (0,0)
-        // result is called i --> skyline point
-
+        // result is called i --> first skyline point
         Set<Point> ret = new HashSet<>();
         var origin = new Point(0,0);
         var i = tree.queryNN(origin);
@@ -127,9 +126,11 @@ public class Skyline {
         var sizeXRectangleQue = new ArrayList<Rectangle>();
         var sizeYRectangleQue = new ArrayList<Rectangle>();
 
+        // for rectangles that have a limited x size
         sizeXRectangleQue.add(new Rectangle(origin.x, i.y, i.x,infinity));
-        sizeYRectangleQue.add(new Rectangle(i.x, origin.y,infinity,i.y ));
 
+        // fore rectangles that have a limited y size
+        sizeYRectangleQue.add(new Rectangle(i.x, origin.y,infinity,i.y ));
 
         // for sizeX
         do {
@@ -140,8 +141,8 @@ public class Skyline {
                 continue;
 
             ret.add(skyLinePoint);
+            // the only difference in the tow do while loops
             sizeXRectangleQue.add(new Rectangle(origin.x, skyLinePoint.y, skyLinePoint.x,infinity));
-
         }while(!sizeXRectangleQue.isEmpty());
 
         // for sizeY
@@ -154,11 +155,7 @@ public class Skyline {
 
             ret.add(skyLinePoint);
             sizeYRectangleQue.add(new Rectangle(skyLinePoint.x, origin.y,infinity,skyLinePoint.y ));
-
         }while(!sizeYRectangleQue.isEmpty());
-
-
-
 
         return ret;
     }
