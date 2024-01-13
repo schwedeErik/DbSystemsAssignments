@@ -30,9 +30,32 @@ psql -d tpch -f skylineFunc.sql
 
 \begin{enumerate}
 \item Create a SQL query to calculate the number of elements in the skyline defined above (without using the \verb+SKYLINE+-operator).
-Submit the query and the result.
+Submit the query and the result.\\\\
+{\bf Solution:}\\
+\begin{lstlisting}[language=sql]
+SELECT COUNT(*) 
+FROM part p
+WHERE NOT EXISTS(
+SELECT *
+FROM part p1
+WHERE p1.p_size >= p.p_size
+AND p1.p_retailprice <= p.p_retailprice
+AND getContainerSize(p1.p_container) <= getContainerSize(p.p_container)
+AND p1.p_brand = p.p_brand
+AND (p1.p_size > p.p_size OR p1.p_retailprice < p.p_retailprice OR getContainerSize(p1.p_container) < getContainerSize(p.p_container)))
+\end{lstlisting}
 
-\item Write the same query using the \verb+SKYLINE+-operator. (You do not have to install the plugin and execute the query.)
+The output of the query is 250.
+
+
+\item Write the same query using the \verb+SKYLINE+-operator. (You do not have to install the plugin and execute the query.)\\\\
+{\bf Solution:}\\
+\begin{lstlisting}[language=sql]
+SELECT COUNT(*) 
+FROM part p
+SKYLINE OF p.p_size MAX, p.p_retailprice MIN, 
+  getContainerSize(p.p_container) MIN, p.p_brand DIFF;
+\end{lstlisting}
 
 \end{enumerate}
 
