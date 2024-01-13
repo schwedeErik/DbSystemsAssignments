@@ -121,7 +121,7 @@ public class Skyline {
         var i = tree.queryNN(origin);
         ret.add(i);
 
-        // a number that is bigger than the biggest inserted dimention
+        // a number that is bigger than the biggest inserted dimension
         var infinity = 10000;
 
         var sizeXRectangleQue = new ArrayList<Rectangle>();
