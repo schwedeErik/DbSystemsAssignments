@@ -112,10 +112,53 @@ public class Skyline {
     }
     
     private static Set<Point> calculateSkyline(FakeRTree tree){
-        //
-        //TODO Your code here!
-        //
-        Set<Point> ret = new HashSet<Point>();
+
+        // find nn to origen (0,0)
+        // result is called i --> skyline point
+
+        Set<Point> ret = new HashSet<>();
+        var origin = new Point(0,0);
+        var i = tree.queryNN(origin);
+        ret.add(i);
+
+        // a number that is bigger than the biggest inserted dimention
+        var infinity = 10000;
+
+        var sizeXRectangleQue = new ArrayList<Rectangle>();
+        var sizeYRectangleQue = new ArrayList<Rectangle>();
+
+        sizeXRectangleQue.add(new Rectangle(origin.x, i.y, i.x,infinity));
+        sizeYRectangleQue.add(new Rectangle(i.x, origin.y,infinity,i.y ));
+
+
+        // for sizeX
+        do {
+            var skyLinePoint = tree.queryNN(origin,sizeXRectangleQue.get(0));
+            sizeXRectangleQue.remove(0);
+
+            if(skyLinePoint == null)
+                continue;
+
+            ret.add(skyLinePoint);
+            sizeXRectangleQue.add(new Rectangle(origin.x, skyLinePoint.y, skyLinePoint.x,infinity));
+
+        }while(!sizeXRectangleQue.isEmpty());
+
+        // for sizeY
+        do {
+            var skyLinePoint = tree.queryNN(origin,sizeYRectangleQue.get(0));
+            sizeYRectangleQue.remove(0);
+
+            if(skyLinePoint == null)
+                continue;
+
+            ret.add(skyLinePoint);
+            sizeYRectangleQue.add(new Rectangle(skyLinePoint.x, origin.y,infinity,skyLinePoint.y ));
+
+        }while(!sizeYRectangleQue.isEmpty());
+
+
+
 
         return ret;
     }
