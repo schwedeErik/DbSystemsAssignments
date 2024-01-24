@@ -1,0 +1,153 @@
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 11}}
+\newcommand{\outdate}{22.01.2024}
+\newcommand{\duedate}{29.01.2024 12:00 MEZ}
+\newcommand{\video}{061}
+
+\begin{document}
+
+\input{../includes/header.tex}
+
+\question[1]{Schedules - RC, ACA, Strict}
+
+For the following schedules, decide in which of the classes RC, ACA, or ST they are.
+
+\begin{eqnarray*}
+s_1\ &:=&r_1(a)\ w_1(a)\ r_2(a)\ r_2(b)\ r_2(a)\ r_1(b)\ c_1\ w_2(b)\ c_2\\
+s_2\ &:=&w_1(b)\ r_1(a)\ r_2(a)\ r_1(b)\ w_2(a)\ w_1(b)\ w_2(b)\ c_2\ c_1\\
+s_3\ &:=&r_2(a)\ r_1(b)\ r_1(a)\ w_2(a)\ w_1(b)\ w_3(b)\ r_3(b)\ c_3\ c_1\ r_2(b)\ c_2\\
+\end{eqnarray*}
+
+\question[1]{2-Phase-Locking and Waits-for-Graph}
+
+\begin{enumerate}
+\item
+  Given the following schedules:
+  \begin{eqnarray*}
+  s_1 &=& r_1(c)\ w_2(a)\ r_1(a)\ r_3(b)\ w_3(a)\ c_3\ w_2(c)\ w_1(c)\ c_1\ c_2\\
+  s_2 &=& w_1(b)\ r_2(c)\ w_3(a)\ w_2(b)\ r_1(a)\ c_1\ c_3\ w_2(a)\ c_2\ 
+  \end{eqnarray*}
+
+  Create a 2PL history for both schedules and note the Waits-for-Graph (WfG) every time it changes.
+  If you encounter a deadlock, abort the transaction that caused the deadlock (No deadlock prevention strategy).
+
+\item Given the following WfG.
+Which nodes are chosen for the strategies \textbf{most cycles} and \textbf{most edges}.
+
+ \scalebox{0.8}{
+ \begin{tikzpicture}[y=.7cm, x=.7cm,font=\sffamily]
+
+   \node[] at (0,0) (t1) {$t_1$}; 
+   \node[] at (2,0) (t2) {$t_2$}; 
+   \node[] at (-1,1.5) (t3) {$t_3$}; 
+   \node[] at (1,1.5) (t4) {$t_4$}; 
+   \node[] at (-1,-1.5) (t5) {$t_5$}; 
+   \node[] at (1,-1.5) (t6) {$t_6$}; 
+   \node[] at (-2,0) (t7) {$t_7$}; 
+
+   \draw[->] (t1) -- (t3);
+   \draw[->] (t1) -- (t7);
+   \draw[->] (t2) to[bend right] (t4);
+   \draw[->] (t3) -- (t4);
+   \draw[->] (t4) -- (t1);
+   \draw[->] (t4) to[bend right] (t2);
+   \draw[->] (t5) -- (t1);
+   \draw[->] (t6) -- (t1);
+   \draw[->] (t6) -- (t5);
+
+ \end{tikzpicture}
+ }
+
+\end{enumerate}
+
+\question[1]{Deadlock prevention}
+Implement a scheduler, which creates a (SS)2PL schedule, using the deadlock prevention strategies wait-die and immediate restart.
+
+Test your program with the given schedule.
+It has to print the output schedule for each of the prevention strategies and indicate when a transaction has to wait or abort.
+After a transaction waits or aborts, you do not have to continue/restart it in the solution history.
+
+$$s :=w_1(x)\ r_2(x)\ w_3(y)\ r_1(y)\ r_3(z)\ w_1(x)\ c_1\ w_2(y)\ c_2\ w_3(y)\ c_3\ $$
+
+You can use the template provided in OLAT, which implements an internal representation of a history and all required operations.
+
+\textbf{Submit the code as separate file and submit the output of running your program with the solution PDF.}
+
+\newpage
+\question[1]{Timestamp-Based Approaches}
+
+\begin{align*}
+s_{1} &= w_1(x) \ r_2(x) \ w_2(x) \ r_1(x) &\\
+s_{2} &= r_1(y) \ w_1(x)  \ r_2(x) \ w_3(x) \ w_1(y) \ w_2(x) \ r_1(x)
+\end{align*}
+
+Describe how a timestamp ordering (TO) based scheduler would execute the operations.
+Complete the following tables.
+Note the used rule in the ``Comment'' column.
+The max-$r$ and max-$w$ columns contain the value of max-$q$-scheduled for the given object.
+One row contains the entry after applying the rule.
+You may assume $ts(t_1) < ts(t_2)$.
+Do not restart aborted transactions.
+
+\ \\
+
+$s_1$:
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|l|}
+\hline
+Operation & max-$r$(x) & max-$w$(x) & Comment \\
+\hline\hline
+$BOT_1$ & $-\infty$ & $-\infty$ &  $ts(t_1) = 1$ \\ \hline
+$BOT_2$ & $-\infty$ & $-\infty$ &  $ts(t_2) = 2$ \\ \hline
+& & &  \\[5pt]\hline
+& & &  \\[5pt]\hline
+& & &  \\[5pt]\hline
+& & &  \\[5pt]\hline
+\end{tabular}
+\end{table}
+
+\ \\
+
+$s_2$ \underline{without} Thomas' write rule:
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|l|}
+\hline
+Operation & max-$r$(x) & max-$w$(x) & max-$r$(y) & max-$w$(y) &  Comment \\
+\hline\hline
+$BOT_1$ & $-\infty$ & $-\infty$ & $-\infty$ & $-\infty$ & $ts(t_1) = 1$ \\ \hline
+$BOT_2$ & $-\infty$ & $-\infty$ & $-\infty$ & $-\infty$ & $ts(t_2) = 2$ \\ \hline
+$BOT_3$ & $-\infty$ & $-\infty$ & $-\infty$ & $-\infty$ & $ts(t_3) = 3$ \\ \hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+\end{tabular}
+\end{table}
+\newpage
+$s_2$ \underline{with} Thomas' write rule:
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|l|}
+\hline
+Operation & max-$r$(x) & max-$w$(x) & max-$r$(y) & max-$w$(y) &  Comment \\
+\hline\hline
+$BOT_1$ & $-\infty$ & $-\infty$ & $-\infty$ & $-\infty$ & $ts(t_1) = 1$ \\ \hline
+$BOT_2$ & $-\infty$ & $-\infty$ & $-\infty$ & $-\infty$ & $ts(t_2) = 2$ \\ \hline
+$BOT_3$ & $-\infty$ & $-\infty$ & $-\infty$ & $-\infty$ & $ts(t_3) = 3$ \\ \hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+& & & & &   \\[5pt]\hline
+\end{tabular}
+\end{table}
+
+\end{document}
